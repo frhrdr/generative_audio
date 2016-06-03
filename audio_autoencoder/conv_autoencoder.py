@@ -2,7 +2,8 @@ from keras.layers import Input, Convolution1D, MaxPooling1D, UpSampling1D
 from keras.models import Model
 import matplotlib.pyplot as plt
 
-class simple_autoencoder:
+
+class ConvAutoencoder:
 
     def __init__(self, train_set, test_set):
         self.train_data = train_set
@@ -33,17 +34,15 @@ class simple_autoencoder:
 
     def train(self, nb_epoch, batch_size, shuffle):
 
-
         self.autoencoder.fit(self.train_data, self.train_data,
-                                nb_epoch=nb_epoch,
-                                batch_size=batch_size,
-                                shuffle=shuffle,
-                                validation_data=(self.test_data, self.test_data))
+                             nb_epoch=nb_epoch,
+                             batch_size=batch_size,
+                             shuffle=shuffle,
+                             validation_data=(self.test_data, self.test_data))
 
     def show(self):
 
-        encoded_imgs = self.encoder.predict(self.test_data)
-        decoded_imgs = self.decoder.predict(encoded_imgs)
+        decoded_imgs = self.autoencoder.predict(self.test_data)
 
         n = 10
         plt.figure(figsize=(20, 4))
