@@ -23,6 +23,11 @@ class AudioPipeline(object):
 
     def load_data(self, max_files=0):
 
+        # loading highest frequencies per file from "PYTHON_FREQ_FILENAME" file
+        freq_input = os.path.join(self._root_path, config.frequency_file)
+        dict_content = open(freq_input, 'r').read()
+        t_dict = eval(dict_content)
+
         print("Loading audio files from: %s" % self._root_path)
         os.chdir(self._root_path)
         for audio in glob.glob("*.wav"):
@@ -32,6 +37,8 @@ class AudioPipeline(object):
                 sample_rate, nd_audio = wav.read(audio_file)
                 self._raw_sample_rates.append(int(sample_rate))
                 self._raw_audios.append(nd_audio)
+                # try to get an entry for highest frequency, otherwise take default
+                self._high_freqs.append(t_dict.get(audio, self.def_highest_freq))
                 self._num_of_files += 1
                 if max_files != 0:
                     if self._num_of_files == max_files:
@@ -39,20 +46,6 @@ class AudioPipeline(object):
             except IOError as e:
                 print('Could not read:', audio_file, ':', e, '- it\'s ok, skipping.')
         print("%d files loaded" % self._num_of_files)
-
-        # loading highest frequencies per file from "PYTHON_FREQ_FILENAME" file
-        freq_input = os.path.join(self._root_path, config.frequency_file)
-        with open(freq_input) as f:
-            self._high_freqs = f.readlines()
-
-        if len(self._high_freqs) <> self._num_of_files:
-            if len(self._high_freqs) > self._num_of_files:
-                # chop off
-                self._high_freqs = self._high_freqs[0:self._num_of_files]
-            else:
-                # we need to add some "default" high frequency values
-                self._high_freqs = self._high_freqs + \
-                                (self._num_of_files - len(self._high_freqs)) * [self.def_highest_freq]
 
     def down_sampling(self):
 
@@ -63,7 +56,7 @@ class AudioPipeline(object):
             q = self._raw_sample_rates[i] / self._new_sample_rates[i]
             # use scipy.signal.decimate to down sample
             self._sampled_audios.append(sg.decimate(self._raw_audios[i], q))
-            # reshape to matrix, make sure that each row respresents 1 second
+            # reshape to matrix, make sure that each row represents 1 second
             length_audio_secs = self._raw_audios[i].shape[0] / self._raw_sample_rates[i]
             self._sampled_audios[i] = np.reshape(self._sampled_audios[i],
                                                  (length_audio_secs , self._new_sample_rates[i]))
@@ -80,8 +73,7 @@ class AudioPipeline(object):
             yield self._raw_audios[i]
             i += 1
 
-
 myAudio = AudioPipeline()
-myAudio.load_data(2)
+myAudio.load_data(3)
 myAudio.down_sampling()
 
