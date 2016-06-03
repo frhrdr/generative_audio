@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense, Convolution2D, MaxPooling2D, UpSampling2D
+from keras.layers import Input, Convolution2D, MaxPooling2D, UpSampling2D
 from keras.models import Model
 from keras.datasets import mnist
 import numpy as np
