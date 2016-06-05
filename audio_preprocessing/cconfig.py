@@ -18,7 +18,7 @@ class Configuration(object):
         return self.get_frequency_file()
 
     def get_frequency_file(self):
-        return os.environ.get("PYTHON_FREQ_FILENAME")
+        return os.environ.get("PYTHON_FREQ_FILENAME", "UNUSED")
 
 
 config = Configuration()
