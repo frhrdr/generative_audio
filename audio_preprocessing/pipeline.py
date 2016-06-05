@@ -59,7 +59,6 @@ class AudioPipeline(object):
             new_sample_rate = 2 * int(self._high_freqs[i]) + self._offset
             # compute factor for down sampling
             q = raw_audio.sample_rate / new_sample_rate
-            print("shape raw", raw_audio.nd_signal.shape)
             # use scipy.signal.decimate to down sample
             new_audio = AudioSignal(sg.decimate(raw_audio.nd_signal, q), new_sample_rate)
             self._sampled_audios.append(new_audio)
@@ -68,10 +67,8 @@ class AudioPipeline(object):
             print("(old/new) shape ", self._raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
 
     def next_sample(self, a_type='raw', batch_size=None):
-
         i = 0
         while True:
-
             if batch_size == i + 1 or i == self._num_of_files:
                 break
             print("nextFileGenerator %d" % i)
@@ -96,11 +93,12 @@ class AudioSignal(object):
     def normalize(self):
         # normalize amplitude values to a range between -1 and 1
         self.is_normalized = True
-        self.nd_signal /= np.max(np.abs(self.nd_signal), axis=0)
+        self.nd_signal = self.nd_signal / float(np.max(np.abs(self.nd_signal)))
 
     @property
     def normalized_signal_matrix(self):
         if not self.is_normalized:
+            print("Normalize...")
             self.normalize()
         return self.make_matrix()
 
@@ -121,13 +119,16 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
     plt.show()
 
 
-#myAudio = AudioPipeline()
-# load 2 audio files
-#myAudio.load_data(2)
-#myAudio.down_sampling()
-
-#x_train = next(myAudio.next_sample('sampled'))
-#x_test = next(myAudio.next_sample('sampled'))
-
-#M = x_train.normalized_signal_matrix
-#print("Shape of final matrix ", M.shape)
+# myAudio = AudioPipeline()
+# # # load 2 audio files
+# myAudio.load_data(1)
+# myAudio.down_sampling()
+# #
+# x_train = next(myAudio.next_sample('sampled'))
+# # x_test = next(myAudio.next_sample('sampled'))
+# # x_valid = next(myAudio.next_sample('sampled'))
+# M = x_train.normalized_signal_matrix
+# print("Shape of final matrix ", M.shape)
+#
+# plt.plot(myAudio._raw_audios[0].nd_signal[0:1000], 'g')
+# plt.show()
