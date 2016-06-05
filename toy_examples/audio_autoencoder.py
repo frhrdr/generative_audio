@@ -10,14 +10,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # this is the size of our encoded representations
-encoding_dim = 32  # 32 floats -> compression of factor 24.5, assuming the input is 784 floats
+encoding_dim = 40  # 32 floats -> compression of factor 24.5, assuming the input is 784 floats
 
 # this is our input placeholder
 input_img = Input(shape=(882,))
 # "encoded" is the encoded representation of the input
 encoded = Dense(encoding_dim, activation='relu', activity_regularizer=regularizers.activity_l1(10e-5))(input_img)
 # "decoded" is the lossy reconstruction of the input
-decoded = Dense(882, activation='sigmoid')(encoded)
+decoded = Dense(882, activation='tanh')(encoded)
 
 # this model maps an input to its reconstruction
 autoencoder = Model(input=input_img, output=decoded)
@@ -44,7 +44,7 @@ myAudios.down_sampling()
 audio_train = next(myAudios.next_sample('sampled'))
 
 x_train = audio_train.normalized_signal_matrix
-# x_test = myAudios._raw_audios[0].normalized_signal_matrix[0:1000]
+# x_test = myAudios.raw_audios[0].normalized_signal_matrix[0:1000]
 print(x_train.shape)
 
 autoencoder.fit(x_train, x_train,
