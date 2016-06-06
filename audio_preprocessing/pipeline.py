@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 class AudioPipeline(object):
 
-    def __init__(self):
+    def __init__(self, n_to_load=1):
         self.raw_audios = []
         self.num_of_files = 0
         self._sampled_audios = []
@@ -19,8 +19,12 @@ class AudioPipeline(object):
         self.def_highest_freq = 440
         self._high_freqs = []
         self._offset = 2
+        self._n_to_load = n_to_load
 
-    def load_data(self, max_files=0):
+        self.load_data()
+        self.down_sampling()
+
+    def load_data(self):
 
         # loading highest frequencies per file from "PYTHON_FREQ_FILENAME" file
         if config.frequency_file == "UNUSED":
@@ -45,8 +49,8 @@ class AudioPipeline(object):
                 # try to get an entry for highest frequency, otherwise take default
                 self._high_freqs.append(t_dict.get(audio, self.def_highest_freq))
                 self.num_of_files += 1
-                if max_files != 0:
-                    if self.num_of_files == max_files:
+                if self._n_to_load != 0:
+                    if self.num_of_files == self._n_to_load:
                         break
             except IOError as e:
                 print('Could not read:', audio_file, ':', e, '- it\'s ok, skipping.')
@@ -65,18 +69,17 @@ class AudioPipeline(object):
 
             print("(old/new) shape ", self.raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
 
-    def next_sample(self, a_type='raw', batch_size=None):
+    def train_batches(self, a_type='sampled', batch_size=None):
         idx = 0
         while True:
             if batch_size == idx + 1 or idx == self.num_of_files:
                 break
-            print("nextFileGenerator %d" % idx)
+            print("BatchID %d of type %s" % (idx, a_type))
             if a_type == 'raw':
                 yield self.raw_audios[idx]
             else:
                 yield self._sampled_audios[idx]
             idx += 1
-            print("after yield i = %d" % idx)
 
 
 class AudioSignal(object):
@@ -123,11 +126,11 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
     plt.show()
 
 
-# myAudios = AudioPipeline()
+# myAudios = AudioPipeline(2)
 # load 2 audio files
-# myAudios.load_data(1)
-# myAudios.down_sampling()
-
+# batches = myAudios.train_batches()
+# print(next(batches))
+# print(next(batches))
 # x_train = next(myAudios.next_sample('sampled', 2))
 # print(x_train.divisible_matrix(16).shape)
 # x_test = next(myAudios.next_sample('raw', 2))
