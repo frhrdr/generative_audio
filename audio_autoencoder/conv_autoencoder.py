@@ -1,42 +1,41 @@
 from keras.layers import Input, Convolution1D, MaxPooling1D, UpSampling1D
 from keras.models import Model
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 class ConvAutoencoder:
 
     def __init__(self, train_set, test_set):
+        fdim = train_set.shape[1]
 
-        #x_train = np.reshape(x_train, (len(x_train), 1, 28, 28))
-
-
-
+        train_set = np.reshape(train_set, (train_set.shape[0], fdim, 1))
+        test_set = np.reshape(test_set, (test_set.shape[0], fdim, 1))
 
         self.train_data = train_set
         self.test_data = test_set
         self.encoding_dim = train_set.shape[1]
 
-        input_img = Input(shape=(1000,))
+        input_img = Input(shape=(fdim, 1))
 
         x = Convolution1D(16, 3, activation='relu', border_mode='same')(input_img)
-        x = MaxPooling1D(2, border_mode='valid')(x)
+        x = MaxPooling1D(2, border_mode='same')(x)
         x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
-        x = MaxPooling1D(2, border_mode='valid')(x)
-    #    x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
-    #    encoded = MaxPooling1D(2, border_mode='same')(x)
+        x = MaxPooling1D(2, border_mode='same')(x)
+        x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
+        encoded = MaxPooling1D(2, border_mode='same')(x)
 
-        #
-
-    #    x = Convolution1D(8, 3, activation='relu', border_mode='same')(encoded)
-    #    x = UpSampling1D(2)(x)
+        x = Convolution1D(8, 3, activation='relu', border_mode='same')(encoded)
+        x = UpSampling1D(2)(x)
         x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
         x = UpSampling1D(2)(x)
         x = Convolution1D(16, 3, activation='relu')(x)
         x = UpSampling1D(2)(x)
-        decoded = Convolution1D(1, 3, activation='tanh', border_mode='same')(x)
+        decoded = Convolution1D(1, 3, activation='tanh', border_mode='valid')(x)
 
         self.autoencoder = Model(input=input_img, output=decoded)
-        self.autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+        self.autoencoder.compile(optimizer='adagrad', loss='binary_crossentropy')
+
+        self.autoencoder.summary()
 
     def train(self, nb_epoch, batch_size, shuffle):
 
@@ -45,7 +44,7 @@ class ConvAutoencoder:
                              nb_epoch=nb_epoch,
                              batch_size=batch_size,
                              shuffle=shuffle,
-                             validation_data=(self.test_data, self.test_data))
+                             validation_data=(self.train_data, self.train_data))
 
     def show(self):
 

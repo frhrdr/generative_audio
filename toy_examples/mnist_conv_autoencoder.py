@@ -26,6 +26,8 @@ decoded = Convolution2D(1, 3, 3, activation='sigmoid', border_mode='same')(x)
 autoencoder = Model(input=input_img, output=decoded)
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
+autoencoder.summary()
+
 (x_train, _), (x_test, _) = mnist.load_data()
 
 x_train = x_train.astype('float32') / 255.
