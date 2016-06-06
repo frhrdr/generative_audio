@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 class ConvAutoencoder:
 
     def __init__(self, train_set, test_set):
+
+        #x_train = np.reshape(x_train, (len(x_train), 1, 28, 28))
+
+
+
+
         self.train_data = train_set
         self.test_data = test_set
         self.encoding_dim = train_set.shape[1]
@@ -27,12 +33,13 @@ class ConvAutoencoder:
         x = UpSampling1D(2)(x)
         x = Convolution1D(16, 3, activation='relu')(x)
         x = UpSampling1D(2)(x)
-        decoded = Convolution1D(1, 3, activation='sigmoid', border_mode='same')(x)
+        decoded = Convolution1D(1, 3, activation='tanh', border_mode='same')(x)
 
         self.autoencoder = Model(input=input_img, output=decoded)
         self.autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
     def train(self, nb_epoch, batch_size, shuffle):
+
 
         self.autoencoder.fit(self.train_data, self.train_data,
                              nb_epoch=nb_epoch,
