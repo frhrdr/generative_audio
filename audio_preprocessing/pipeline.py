@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 class AudioPipeline(object):
 
     def __init__(self):
-        self._raw_audios = []
-        self._num_of_files = 0
+        self.raw_audios = []
+        self.num_of_files = 0
         self._sampled_audios = []
         self._root_path = config.datapath
         self.def_highest_freq = 440
@@ -41,21 +41,20 @@ class AudioPipeline(object):
                 audio = AudioSignal(nd_audio, int(sample_rate))
                 audio.normalize()
                 # store original sample rate
-                self._raw_audios.append(audio)
+                self.raw_audios.append(audio)
                 # try to get an entry for highest frequency, otherwise take default
                 self._high_freqs.append(t_dict.get(audio, self.def_highest_freq))
-                self._num_of_files += 1
+                self.num_of_files += 1
                 if max_files != 0:
-                    if self._num_of_files == max_files:
+                    if self.num_of_files == max_files:
                         break
             except IOError as e:
                 print('Could not read:', audio_file, ':', e, '- it\'s ok, skipping.')
-        print("%d files loaded" % self._num_of_files)
+        print("%d files loaded" % self.num_of_files)
 
     def down_sampling(self):
 
-        for i, raw_audio in enumerate(self._raw_audios):
-            # compute Nyquist sampling rate for this audio file
+        for i, raw_audio in enumerate(self.raw_audios):
             new_sample_rate = 2 * int(self._high_freqs[i]) + self._offset
             # compute factor for down sampling
             q = raw_audio.sample_rate / new_sample_rate
@@ -64,19 +63,20 @@ class AudioPipeline(object):
             self._sampled_audios.append(new_audio)
             # reshape to matrix, make sure that each row represents 1 second
 
-            print("(old/new) shape ", self._raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
+            print("(old/new) shape ", self.raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
 
     def next_sample(self, a_type='raw', batch_size=None):
-        i = 0
+        idx = 0
         while True:
-            if batch_size == i + 1 or i == self._num_of_files:
+            if batch_size == idx + 1 or idx == self.num_of_files:
                 break
-            print("nextFileGenerator %d" % i)
+            print("nextFileGenerator %d" % idx)
             if a_type == 'raw':
-                yield self._raw_audios[i]
+                yield self.raw_audios[idx]
             else:
-                yield self._sampled_audios[i]
-            i += 1
+                yield self._sampled_audios[idx]
+            idx += 1
+            print("after yield i = %d" % idx)
 
 
 class AudioSignal(object):
@@ -98,9 +98,13 @@ class AudioSignal(object):
     @property
     def normalized_signal_matrix(self):
         if not self.is_normalized:
-            print("Normalize...")
             self.normalize()
         return self.make_matrix()
+
+    def divisible_matrix(self, divisor):
+        rest = self.sample_rate % divisor
+        return self.normalized_signal_matrix[:, rest:]
+
 
 
 def plot_signal_simple(sig, t_range=None, p_title=None):
@@ -119,16 +123,17 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
     plt.show()
 
 
-# myAudio = AudioPipeline()
-# # # load 2 audio files
-# myAudio.load_data(1)
-# myAudio.down_sampling()
-# #
-# x_train = next(myAudio.next_sample('sampled'))
-# # x_test = next(myAudio.next_sample('sampled'))
+# myAudios = AudioPipeline()
+# load 2 audio files
+# myAudios.load_data(1)
+# myAudios.down_sampling()
+
+# x_train = next(myAudios.next_sample('sampled', 2))
+# print(x_train.divisible_matrix(16).shape)
+# x_test = next(myAudios.next_sample('raw', 2))
 # # x_valid = next(myAudio.next_sample('sampled'))
 # M = x_train.normalized_signal_matrix
 # print("Shape of final matrix ", M.shape)
 #
-# plt.plot(myAudio._raw_audios[0].nd_signal[0:1000], 'g')
+# plt.plot(myAudio.raw_audios[0].nd_signal[0:1000], 'g')
 # plt.show()
