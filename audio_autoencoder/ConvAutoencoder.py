@@ -1,4 +1,4 @@
-from keras.layers import Input, Convolution1D, MaxPooling1D, UpSampling1D
+from keras.layers import Input, Convolution1D, MaxPooling1D, UpSampling1D, ZeroPadding1D
 from keras.models import Model
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,17 +17,19 @@ class ConvAutoencoder:
 
         input_img = Input(shape=(fdim, 1))
 
+        assert fdim % 8 == 0, "max pools require input divisible by 2^3"
+
         x = Convolution1D(16, 3, activation='relu', border_mode='same')(input_img)
         x = MaxPooling1D(2, border_mode='valid')(x)
-        #x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
-        #x = MaxPooling1D(2, border_mode='valid')(x)
-        #x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
-        #encoded = MaxPooling1D(2, border_mode='valid')(x)
+        x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
+        x = MaxPooling1D(2, border_mode='valid')(x)
+        x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
+        encoded = MaxPooling1D(2, border_mode='valid')(x)
 
-        #x = Convolution1D(8, 3, activation='relu', border_mode='same')(encoded)
-        #x = UpSampling1D(2)(x)
-        #x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
-        #x = UpSampling1D(2)(x)
+        x = Convolution1D(8, 3, activation='relu', border_mode='same')(encoded)
+        x = UpSampling1D(2)(x)
+        x = Convolution1D(8, 3, activation='relu', border_mode='same')(x)
+        x = UpSampling1D(2)(x)
         x = Convolution1D(16, 3, activation='relu', border_mode='same')(x)
         x = UpSampling1D(2)(x)
         decoded = Convolution1D(1, 3, activation='tanh', border_mode='same')(x)

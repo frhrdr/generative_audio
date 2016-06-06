@@ -14,6 +14,6 @@ test_audio = x_data[800:, :]
 
 auto = ConvAutoencoder(train_audio, test_audio)
 
-auto.train(1, 100, True)
+auto.train(5, 100, True)
 
 auto.show()
