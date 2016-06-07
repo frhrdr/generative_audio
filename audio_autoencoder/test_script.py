@@ -1,12 +1,11 @@
 from audio_preprocessing.pipeline import AudioPipeline
 from ConvAutoencoder import ConvAutoencoder
 
-myAudios = AudioPipeline()
-# load 2 audio files
-myAudios.load_data(1)
-myAudios.down_sampling()
-audio_data = next(myAudios.next_sample('sampled'))
-x_data = audio_data.divisible_matrix(2^3)
+myAudios = AudioPipeline(1)
+
+batches = myAudios.train_batches()
+# print(next(batches))
+x_data = next(batches).divisible_matrix(16)
 
 
 train_audio = x_data[:800, :]
