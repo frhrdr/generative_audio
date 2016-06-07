@@ -10,6 +10,8 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 #### About RNN/LSTMs
 
+[Introduction to RNN/LSTM](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/)
+
 [Oxford video lecture about RNN/LSTM Nando de Freitas](https://www.youtube.com/watch?v=56TYLaQN4N8)
 
 [Keras for Sequence to Sequence Learning](https://bigaidream.gitbooks.io/subsets_ml_cookbook/content/dl/theano/theano_keras_sequence2sequence.html)
