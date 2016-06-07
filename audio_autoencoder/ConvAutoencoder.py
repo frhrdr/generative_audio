@@ -2,6 +2,8 @@ from keras.layers import Input, Convolution1D, MaxPooling1D, UpSampling1D, ZeroP
 from keras.models import Model
 import matplotlib.pyplot as plt
 import numpy as np
+from keras import backend as K
+
 
 class ConvAutoencoder:
 

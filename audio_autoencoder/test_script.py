@@ -6,7 +6,7 @@ myAudios = AudioPipeline()
 myAudios.load_data(1)
 myAudios.down_sampling()
 audio_data = next(myAudios.next_sample('sampled'))
-x_data = audio_data.normalized_signal_matrix
+x_data = audio_data.divisible_matrix(2^3)
 
 
 train_audio = x_data[:800, :]
