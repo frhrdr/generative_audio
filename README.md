@@ -22,6 +22,8 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 #### RNN/LSTM and audio
 
+[Learning to generate text and audio](http://www.genekogan.com/works/learning-sequences.html)
+
 [GRUV is a Python project for algorithmic music generation](https://github.com/MattVitelli/GRUV)
 
 ### Presentations
