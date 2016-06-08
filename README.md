@@ -36,6 +36,8 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 [video - Simple(?) Step by Step](https://www.youtube.com/watch?v=mkGsMWi_j4Q)
 
+[python - How to plot frequency spectrum?](http://glowingpython.blogspot.nl/2011/08/how-to-plot-frequency-spectrum-with.html)
+
 ### Presentations
 [Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
 
