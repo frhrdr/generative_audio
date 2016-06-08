@@ -11,16 +11,16 @@ import matplotlib.pyplot as plt
 
 class AudioPipeline(object):
 
-    def __init__(self, n_to_load=1):
+    def __init__(self, folder_spec, n_to_load=1, highest_freq=440):
         self.raw_audios = []
         self.num_of_files = 0
         self._sampled_audios = []
-        self._root_path = config.datapath
-        self.def_highest_freq = 440
+        self._root_path = config.datapath + folder_spec
+        self.def_highest_freq = highest_freq
         self._high_freqs = []
         self._offset = 2
         self._n_to_load = n_to_load
-
+        self._folder_spec = folder_spec
         self.load_data()
         self.down_sampling()
 
@@ -42,6 +42,10 @@ class AudioPipeline(object):
             try:
                 # read file
                 sample_rate, nd_audio = wav.read(audio_file)
+                # some of the samples we use are recorded in stereo, but the signal is actually mono
+                # so we can just skip one channel
+                if nd_audio.shape[1] == 2:
+                    nd_audio = nd_audio[:, 0]
                 audio = AudioSignal(nd_audio, int(sample_rate))
                 audio.normalize()
                 # store original sample rate
@@ -109,7 +113,6 @@ class AudioSignal(object):
         return self.normalized_signal_matrix[:, rest:]
 
 
-
 def plot_signal_simple(sig, t_range=None, p_title=None):
     # plot a range of the signal
     if t_range is None:
@@ -126,9 +129,9 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
     plt.show()
 
 
-# myAudios = AudioPipeline(2)
+myAudios = AudioPipeline('D - data_flute_vib/', 2)
 # load 2 audio files
-# batches = myAudios.train_batches()
+batches = myAudios.train_batches()
 # print(next(batches))
 # print(next(batches))
 # x_train = next(myAudios.next_sample('sampled', 2))
