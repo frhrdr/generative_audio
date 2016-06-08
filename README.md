@@ -8,6 +8,8 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 [Python & audio](http://eprints.maynoothuniversity.ie/4115/1/40.pdf)
 
+[Digital Signal Processing](http://www.dspguide.com/)
+
 #### About RNN/LSTMs
 
 [Introduction to RNN/LSTM](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/)
