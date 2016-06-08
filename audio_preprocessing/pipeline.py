@@ -129,9 +129,9 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
     plt.show()
 
 
-myAudios = AudioPipeline('D - data_flute_vib/', 2)
+# myAudios = AudioPipeline('D - data_flute_vib/', 2)
 # load 2 audio files
-batches = myAudios.train_batches()
+#  batches = myAudios.train_batches()
 # print(next(batches))
 # print(next(batches))
 # x_train = next(myAudios.next_sample('sampled', 2))
