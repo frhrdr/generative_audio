@@ -44,8 +44,9 @@ class AudioPipeline(object):
                 sample_rate, nd_audio = wav.read(audio_file)
                 # some of the samples we use are recorded in stereo, but the signal is actually mono
                 # so we can just skip one channel
-                if nd_audio.shape[1] == 2:
-                    nd_audio = nd_audio[:, 0]
+                if nd_audio.ndim > 1:
+                    if nd_audio.shape[1] == 2:
+                        nd_audio = nd_audio[:, 0]
                 audio = AudioSignal(nd_audio, int(sample_rate))
                 audio.normalize()
                 # store original sample rate
@@ -112,6 +113,13 @@ class AudioSignal(object):
         rest = self.sample_rate % divisor
         return self.normalized_signal_matrix[:, rest:]
 
+    def custom_matrix(self, chunks_per_sec=1):
+        dim0 = self.duration * chunks_per_sec
+        dim1 = self.nd_signal.shape[0] / dim0
+        sig_len = dim0 * dim1
+        print(sig_len)
+        return np.reshape(self.nd_signal[0:sig_len], (dim0, dim1))
+
 
 def plot_signal_simple(sig, t_range=None, p_title=None):
     # plot a range of the signal
@@ -131,15 +139,8 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
 
 # myAudios = AudioPipeline('D - data_flute_vib/', 2)
 # load 2 audio files
-#  batches = myAudios.train_batches()
+# batches = myAudios.train_batches()
+# audio = next(batches)
+# print("Shape ", audio.custom_matrix(1).shape)
 # print(next(batches))
 # print(next(batches))
-# x_train = next(myAudios.next_sample('sampled', 2))
-# print(x_train.divisible_matrix(16).shape)
-# x_test = next(myAudios.next_sample('raw', 2))
-# # x_valid = next(myAudio.next_sample('sampled'))
-# M = x_train.normalized_signal_matrix
-# print("Shape of final matrix ", M.shape)
-#
-# plt.plot(myAudio.raw_audios[0].nd_signal[0:1000], 'g')
-# plt.show()
