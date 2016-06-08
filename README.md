@@ -26,7 +26,9 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 [GRUV is a Python project for algorithmic music generation](https://github.com/MattVitelli/GRUV)
 
-[fiala notes - Deep Learning and Sound ~ 02: Generating Audio](http://fiala.uk/notes/deep-learning-and-sound-02-generating-audio)
+[fiala notes 1- Deep Learning and Sound ~ 01 Introduction ](http://fiala.uk/notes/deep-learning-and-sound-01-intro)
+
+[fiala notes 2- Deep Learning and Sound ~ 02: Generating Audio](http://fiala.uk/notes/deep-learning-and-sound-02-generating-audio)
 
 ### Presentations
 [Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
