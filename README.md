@@ -32,6 +32,10 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 [fiala notes 2- Deep Learning and Sound ~ 02: Generating Audio](http://fiala.uk/notes/deep-learning-and-sound-02-generating-audio)
 
+#### Discrete Fourier Transform
+
+[video - Simple(?) Step by Step](https://www.youtube.com/watch?v=mkGsMWi_j4Q)
+
 ### Presentations
 [Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
 
