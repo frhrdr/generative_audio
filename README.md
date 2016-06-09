@@ -46,3 +46,5 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 ### Data
 [Link to instrument files for first experiment](http://theremin.music.uiowa.edu/MIS.html#)
 Klick auf der Seite auf "Musical Instrument Samples/Post 2012/Woodwinds"
+
+[List of frequency ranges of many classical instruments](http://www.zytrax.com/tech/audio/audio.html#frequencies)
