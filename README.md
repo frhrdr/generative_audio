@@ -22,6 +22,8 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 [Neat explanation of different LSTM variants with some good visualization](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
 
+[When and How to use TimeDistributedDense](https://github.com/fchollet/keras/issues/1029)
+
 #### RNN/LSTM and audio
 
 [Learning to generate text and audio](http://www.genekogan.com/works/learning-sequences.html)
