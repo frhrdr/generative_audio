@@ -14,8 +14,8 @@ class Configuration(object):
         return os.environ.get(env_variable, "data")
 
     @property
-    def frequency_file(self):
-        return self.get_frequency_file()
+    def frequency_of_format(self):
+        return 44100   # frequency of file format, in this case wav files
 
     def get_frequency_file(self):
         return os.environ.get("PYTHON_FREQ_FILENAME", "UNUSED")
