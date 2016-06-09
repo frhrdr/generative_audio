@@ -9,34 +9,63 @@ import glob
 import matplotlib.pyplot as plt
 
 
+def load_matrix(folder_spec, data):
+
+    numpy_file = config.datapath + folder_spec + data + '.npy'
+    with open(numpy_file, 'rb') as fs:
+        np_data = np.load(fs)
+        for obj_id in np_data:
+            print(obj_id)
+            if obj_id == 'x_data':
+                x_data = np_data[obj_id]
+            elif obj_id == 'y_data':
+                y_data = np_data[obj_id]
+    return x_data, y_data
+
+
+def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
+    block_lists = []
+    total_samples = nd_audio.shape[0]
+    num_samples_so_far = 0
+    while num_samples_so_far < total_samples:
+        block = nd_audio[num_samples_so_far:num_samples_so_far + block_size]
+        if block.shape[0] < block_size:
+            padding = np.zeros((block_size - block.shape[0],))
+            block = np.concatenate((block, padding))
+        block_lists.append(block)
+        num_samples_so_far += block_size
+    return block_lists
+
+
 class AudioPipeline(object):
 
-    def __init__(self, folder_spec, n_to_load=1, highest_freq=440):
+    def __init__(self, folder_spec, n_to_load=1, highest_freq=440, clip_len=2):
         self.raw_audios = []
         self.num_of_files = 0
         self._sampled_audios = []
         self._root_path = config.datapath + folder_spec
         self.def_highest_freq = highest_freq
-        self._high_freqs = []
         self._offset = 2
         self._n_to_load = n_to_load
         self._folder_spec = folder_spec
+        self._clip_length = clip_len # all audio's will be cut to the same clip length (in seconds)
+        self.new_sample_rate = 0 # to be determined during down sampling method
+        self.block_size = 0      # to be determined later, depends on new sample rate/frequency
         self.load_data()
         self.down_sampling()
 
     def load_data(self):
 
-        # loading highest frequencies per file from "PYTHON_FREQ_FILENAME" file
-        if config.frequency_file == "UNUSED":
-            t_dict = {}
-        else:
-            freq_input = os.path.join(self._root_path, config.frequency_file)
-            dict_content = open(freq_input, 'r').read()
-            t_dict = eval(dict_content)
-
         print("Loading audio files from: %s" % self._root_path)
         os.chdir(self._root_path)
-        for audio in glob.glob("*.wav"):
+        files_to_load = glob.glob("*.wav")
+        # print("# files to load %d (max to load %d)" % (len(files_to_load), self._n_to_load ))
+        if len(files_to_load) > self._n_to_load:
+            files_to_load = files_to_load[:self._n_to_load]
+        else:
+            self._n_to_load = len(files_to_load)
+
+        for audio in files_to_load:
             audio_file = os.path.join(self._root_path, audio)
 
             try:
@@ -51,28 +80,67 @@ class AudioPipeline(object):
                 audio.normalize()
                 # store original sample rate
                 self.raw_audios.append(audio)
-                # try to get an entry for highest frequency, otherwise take default
-                self._high_freqs.append(t_dict.get(audio, self.def_highest_freq))
+
                 self.num_of_files += 1
-                if self._n_to_load != 0:
-                    if self.num_of_files == self._n_to_load:
-                        break
             except IOError as e:
                 print('Could not read:', audio_file, ':', e, '- it\'s ok, skipping.')
         print("%d files loaded" % self.num_of_files)
 
     def down_sampling(self):
 
+        self.new_sample_rate = 2 * int(self.def_highest_freq) + self._offset
+        # compute factor for down sampling
+        q = config.frequency_of_format / self.new_sample_rate
+        print("Original sample rate %d, new sample rate %d, down sampling factor %d" % (config.frequency_of_format,
+                                                                                        self.new_sample_rate,
+                                                                                        q))
         for i, raw_audio in enumerate(self.raw_audios):
-            new_sample_rate = 2 * int(self._high_freqs[i]) + self._offset
-            # compute factor for down sampling
-            q = raw_audio.sample_rate / new_sample_rate
             # use scipy.signal.decimate to down sample
-            new_audio = AudioSignal(sg.decimate(raw_audio.nd_signal, q), new_sample_rate)
+            new_audio = AudioSignal(sg.decimate(raw_audio.nd_signal, q), self.new_sample_rate)
             self._sampled_audios.append(new_audio)
-            # reshape to matrix, make sure that each row represents 1 second
-
             print("(old/new) shape ", self.raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
+
+    def create_train_matrix(self, f_name_out):
+        # block sizes used for training - this defines the size of our input state
+        self.block_size = self.new_sample_rate / 4
+        # Used later for zero-padding song sequences
+        max_seq_len = int(round((self.new_sample_rate * self._clip_length) / self.block_size))
+        print("Using new sample rate %d and block size %d, max seq length %d" % (self.new_sample_rate, self.block_size,
+                                                                                 max_seq_len))
+        chunks_X = []
+        chunks_Y = []
+
+        for idx, audio in enumerate(self._sampled_audios):
+            x_t = convert_nd_audio_to_sample_blocks(audio.nd_signal, self.block_size)
+            y_t = x_t[1:]
+            y_t.append(np.zeros(self.block_size))  # Add special end block composed of all zeros
+
+            cur_seq = 0
+            total_seq = len(x_t)
+            # print("total_seq ", total_seq)
+            # print("max_seq_len ", max_seq_len)
+            while cur_seq + max_seq_len < total_seq:
+                chunks_X.append(x_t[cur_seq:cur_seq + max_seq_len])
+                chunks_Y.append(y_t[cur_seq:cur_seq + max_seq_len])
+                cur_seq += max_seq_len
+
+        num_examples = len(chunks_X)
+        num_dims_out = self.block_size
+        print("num examples %d" % num_examples)
+        out_shape = (num_examples, max_seq_len, num_dims_out)
+        x_data = np.zeros(out_shape)
+        y_data = np.zeros(out_shape)
+        for n in xrange(num_examples):
+            for i in xrange(max_seq_len):
+                x_data[n][i] = chunks_X[n][i]
+                y_data[n][i] = chunks_Y[n][i]
+
+        numpy_file = self._root_path + f_name_out + '.npy'
+        print('Flushing to disk (%s)...' % numpy_file)
+
+        obj_saved = {'x_data': x_data, 'y_data': y_data}
+        with open(numpy_file, 'wb') as fs:
+            np.savez_compressed(fs, **obj_saved)
 
     def train_batches(self, a_type='sampled', batch_size=None):
         idx = 0
