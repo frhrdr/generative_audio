@@ -11,8 +11,9 @@ x_data = next(batches).divisible_matrix(16)
 train_audio = x_data[:800, :]
 test_audio = x_data[800:, :]
 
+
 auto = ConvAutoencoder(train_audio, test_audio)
 
-auto.train(100, 256, True)
+auto.train(1, 256, True)
 
 auto.show()

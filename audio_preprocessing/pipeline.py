@@ -100,9 +100,13 @@ class AudioPipeline(object):
             self._sampled_audios.append(new_audio)
             print("(old/new) shape ", self.raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
 
-    def create_train_matrix(self, f_name_out):
+    def create_train_matrix(self, f_name_out, chunks_per_sec=4):
+        """
+            This code is a modification of some of the data loading utilities of GRUV repository
+             https://github.com/MattVitelli/GRUV/
+        """
         # block sizes used for training - this defines the size of our input state
-        self.block_size = self.new_sample_rate / 4
+        self.block_size = self.new_sample_rate / chunks_per_sec
         # Used later for zero-padding song sequences
         max_seq_len = int(round((self.new_sample_rate * self._clip_length) / self.block_size))
         print("Using new sample rate %d and block size %d, max seq length %d" % (self.new_sample_rate, self.block_size,
@@ -135,8 +139,17 @@ class AudioPipeline(object):
                 x_data[n][i] = chunks_X[n][i]
                 y_data[n][i] = chunks_Y[n][i]
 
+        mean_x = np.mean(np.mean(x_data, axis=0), axis=0)  # Mean across num examples and num time steps
+        # STD across num examples and num timesteps
+        std_x = np.sqrt(np.mean(np.mean(np.abs(x_data - mean_x) ** 2, axis=0), axis=0))
+        std_x = np.maximum(1.0e-8, std_x)  # Clamp variance if too tiny
+        x_data[:][:] -= mean_x
+        x_data[:][:] /= std_x
+        y_data[:][:] -= mean_x
+        y_data[:][:] /= std_x
+
         numpy_file = self._root_path + f_name_out + '.npy'
-        print('Flushing to disk (%s)...' % numpy_file)
+        print('Save to disk (%s)...' % numpy_file)
 
         obj_saved = {'x_data': x_data, 'y_data': y_data}
         with open(numpy_file, 'wb') as fs:
