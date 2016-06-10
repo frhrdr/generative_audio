@@ -42,6 +42,8 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 ### Presentations
 [Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
+[Week 2 - 10/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/Presentation 10-6-2016.pdf)
+
 
 ### Data
 [Link to instrument files for first experiment](http://theremin.music.uiowa.edu/MIS.html#)
