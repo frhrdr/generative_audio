@@ -2,8 +2,8 @@ from __future__ import print_function
 from pylab import plot, show, title, xlabel, ylabel, subplot
 import numpy as np
 from scipy import fft, arange
-from audio_preprocessing.pipeline import AudioPipeline
 
+# note: add diff to plots
 
 def rms_error(signal, reconstruction, verbose=False):
     n = len(reconstruction)
@@ -37,7 +37,7 @@ def plot_signals(signal, reconstruction, separate=False, display=True):
         show()
 
 
-def plot_spectra(signal, reconstruction, sampling_freq, separate=False, display=True):
+def plot_spectra(signal, reconstruction, sampling_freq, separate=False, display=True, diff=False):
     n = len(signal)
     k = arange(n)
     T = n/float(sampling_freq)
@@ -67,13 +67,3 @@ def plot_spectra(signal, reconstruction, sampling_freq, separate=False, display=
         show()
 
 
-# myAudios = AudioPipeline('instrument_samples/flute_nonvib_wav', 10, highest_freq=5000, clip_len=2, chunks_per_sec=4)
-#
-# d = myAudios.train_signal_pairs['x_data']
-# sig1 = d[1, 2, :]
-# sig2 = d[1, 3, :]
-# sampling_freq = 44100
-#
-# rms_error(sig1, sig2, verbose=False)
-# plot_signals(sig1, sig2, separate=True, display=True)
-# plot_spectra(sig1, sig2, sampling_freq, separate=True, display=True)
