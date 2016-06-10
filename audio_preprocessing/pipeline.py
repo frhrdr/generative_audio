@@ -14,13 +14,19 @@ def load_matrix(folder_spec, data):
     numpy_file = config.datapath + folder_spec + data + '.npy'
     with open(numpy_file, 'rb') as fs:
         np_data = np.load(fs)
+
         for obj_id in np_data:
             print(obj_id)
             if obj_id == 'x_data':
-                x_data = np_data[obj_id]
+                data1 = np_data[obj_id]
             elif obj_id == 'y_data':
-                y_data = np_data[obj_id]
-    return x_data, y_data
+                data2 = np_data[obj_id]
+            elif obj_id == 'mean_x':
+                data1 = np_data[obj_id]
+            elif obj_id == 'std_x':
+                data2 = np_data[obj_id]
+
+    return data1, data2
 
 
 def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
@@ -160,14 +166,17 @@ class AudioPipeline(object):
         y_data[:][:] -= mean_x
         y_data[:][:] /= std_x
 
-        self._train_signal_pairs = {'x_data': x_data, 'y_data': y_data}
+        numpy_file = self._root_path + f_name_out + '.npy'
+        print('Save to disk (%s)...' % numpy_file)
 
-        if f_name_out is not None:
-            numpy_file = self._root_path + f_name_out + '.npy'
-            print('Save to disk (%s)...' % numpy_file)
-
-            with open(numpy_file, 'wb') as fs:
-                np.savez_compressed(fs, **self._train_signal_pairs)
+        obj_saved = {'x_data': x_data, 'y_data': y_data}
+        with open(numpy_file, 'wb') as fs:
+            np.savez_compressed(fs, **obj_saved)
+        # we need the mean and stddev when reconstructing the signal
+        numpy_file = self._root_path + f_name_out + '_stats.npy'
+        obj_saved = {'mean_x': mean_x, 'std_x': std_x}
+        with open(numpy_file, 'wb') as fs:
+            np.savez_compressed(fs, **obj_saved)
 
     @property
     def train_signal_pairs(self):
@@ -264,16 +273,16 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
     plt.show()
 
 
-myAudios = AudioPipeline('instrument_samples/flute_nonvib_wav', 10, highest_freq=5000, clip_len=2, chunks_per_sec=4)
-print(myAudios.train_spectra_pairs.keys())
-x = myAudios.train_spectra_pairs['x_data']
-y = myAudios.train_spectra_pairs['y_data']
-print(x.shape)
-
-print(y.shape)
-
-d = myAudios.train_signal_pairs['x_data']
-print(d.shape)
+# myAudios = AudioPipeline('instrument_samples/flute_nonvib_wav', 10, highest_freq=5000, clip_len=2, chunks_per_sec=4)
+# print(myAudios.train_spectra_pairs.keys())
+# x = myAudios.train_spectra_pairs['x_data']
+# y = myAudios.train_spectra_pairs['y_data']
+# print(x.shape)
+#
+# print(y.shape)
+#
+# d = myAudios.train_signal_pairs['x_data']
+# print(d.shape)
 # load 2 audio files
 # batches = myAudios.train_batches()
 # audio = next(batches)
