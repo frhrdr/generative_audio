@@ -105,7 +105,7 @@ class AudioPipeline(object):
                 # store original sample rate
                 self.raw_audios.append(audio)
                 # if we're not down sampling we need to fill the self._sampled_audios list explicitly
-                if not self.down_sampling:
+                if not self._down_sampling:
                     self._sampled_audios.append(audio)
                 self.num_of_files += 1
             except IOError as e:

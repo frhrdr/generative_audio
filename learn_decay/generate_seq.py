@@ -10,6 +10,8 @@ import scipy.io.wavfile as wav
 def write_np_as_wav(X, sample_rate, filename):
     Xnew = X * 32767.0
     Xnew = Xnew.astype('int16')
+    if ".wav" not in filename:
+        filename += ".wav"
     wav.write(filename, sample_rate, Xnew)
 
 
@@ -37,11 +39,11 @@ def generate_sequence_begin_v2(seq_length, t_data):
     return np.reshape(begin_seq, (1, begin_seq.shape[0], begin_seq.shape[1])), \
             np.reshape(total_seq, (1, total_seq.shape[0], total_seq.shape[1]))
 
-
 data = 'train_nonvib_flute'
 folder_spec = 'D - data_flute_nonvib/'
 x_data, y_data = load_matrix(folder_spec, data)
-
+# add mean and stddev to signal
+mean_x, stddev_x = load_matrix(folder_spec, data + "_stats")
 
 # sequence_begin, label_gen_seq = generate_seq_begin_v1(3, 2, x_data)
 sequence_begin, sequence_total = generate_sequence_begin_v2(3, x_data)
@@ -58,31 +60,54 @@ model.load_weights(model_path)
 
 prime_sequence = sequence_begin.copy()
 sequence_len = sequence_total.shape[1]
+# we store the generated signal in this variable
+# note in the first iteration
 generated_seq = np.zeros((sequence_total.shape[1], sequence_total.shape[2]))
+#     The prime sequence contains e.g. [x1, x2, x3]
+# (1) The first step is to copy the "prime" sequence into the new generated sequence
+generated_seq[:prime_sequence.shape[1]] = prime_sequence[0][:]
 
-for idx in range(sequence_len - prime_sequence.shape[1] + 1):
+#
+# (2) In each step we take the last time slice x_t+1 and concatenate it to the original prime signal
+#     e.g.  Prime                           Output                  Generated sequence
+#           [x1, x2, x3]                    [x2', x3', x4']         [x1, x2, x3, x4']
+#           [x1, x2, x3, x4']               [x2', x3', x4', x5']    [x1, x2, x3, x4', x5]
+for idx in range(sequence_len - prime_sequence.shape[1]):
 
     predict_seq = model.predict(prime_sequence)
     print("predict_seq ", predict_seq.shape)
-    if idx == 0:
-        generated_seq[:prime_sequence.shape[1]] = predict_seq[0][:]
-    else:
-        generated_seq[predict_seq.shape[1] - 1] = predict_seq[0][predict_seq.shape[1] - 1]
-
-    seq_t_plus_1 = predict_seq[0][predict_seq.shape[1]-1][:]
+    seq_t_plus_1 = predict_seq[0][predict_seq.shape[1] - 1][:]
+    generated_seq[predict_seq.shape[1]] = seq_t_plus_1
     seq_t_plus_1 = np.reshape(seq_t_plus_1, (1, 1, seq_t_plus_1.shape[0]))
     prime_sequence = np.concatenate((prime_sequence, seq_t_plus_1), axis=1)
 
-# add again mean and stddev to signal
-mean_x, stddev_x = load_matrix(folder_spec, data + "_stats")
+
 generated_seq[:][:] += mean_x
 generated_seq[:][:] *= stddev_x
 generated_seq = np.reshape(generated_seq, generated_seq.shape[0] * generated_seq.shape[1])
-print(generated_seq.shape[0])
+
 write_np_as_wav(generated_seq, 10002, 'flute_example1')
 
-s_rate, x_signal = wav.read('flute_example1')
+s_rate, x_signal = wav.read('flute_example1.wav')
 print(x_signal.shape)
+ax1 = plt.subplot(311)
+ax1.set_title("Generated signal (with prime)")
+plt.plot(x_signal)
+ax2 = plt.subplot(312)
+
+print(sequence_total.shape)
+sequence_total[:][:] += mean_x
+sequence_total[:][:] *= stddev_x
+sequence_total = np.reshape(sequence_total, sequence_total.shape[1] * sequence_total.shape[2])
+sequence_total = sequence_total * 32767.0
+sequence_total = sequence_total.astype('int16')
+ax2.set_title("Original signal")
+plt.plot(sequence_total)
+ax3 = plt.subplot(313)
+ax3.set_title("Signal difference")
+diff = sequence_total - x_signal
+plt.plot(diff)
+plt.show()
 # diff = sequence_begin - predict_seq
 # plt.subplot(411)
 # plt.plot(diff[0][0])
