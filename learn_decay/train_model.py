@@ -13,7 +13,7 @@ x_data, y_data = load_matrix(folder_spec, data)
 num_frequency_dimensions = x_data.shape[2]
 num_hidden_dimensions = 1024
 batch_size = 10
-epochs = 40
+epochs = 100
 
 model = create_lstm_network(num_frequency_dimensions, num_hidden_dimensions)
 print(model.summary())

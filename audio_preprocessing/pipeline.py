@@ -46,6 +46,7 @@ def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
 class AudioPipeline(object):
 
     def __init__(self, folder_spec='', n_to_load=1, highest_freq=440, clip_len=2, mat_dirs=None, chunks_per_sec=4):
+        self.down_sampling = False
         self.raw_audios = []
         self.num_of_files = 0
         self._sampled_audios = []
@@ -58,7 +59,10 @@ class AudioPipeline(object):
         self.new_sample_rate = 0 # to be determined during down sampling method
         self.block_size = 0      # to be determined later, depends on new sample rate/frequency
         self.load_data()
-        self.down_sampling()
+        if self.down_sampling:
+            self.down_sampling()
+        else:
+            self.new_sample_rate = config.frequency_of_format
 
         self.chunks_per_sec = chunks_per_sec
         self._train_signal_pairs = None
@@ -98,7 +102,9 @@ class AudioPipeline(object):
                 audio.normalize()
                 # store original sample rate
                 self.raw_audios.append(audio)
-
+                # if we're not down sampling we need to fill the self._sampled_audios list explicitly
+                if not self.down_sampling:
+                    self._sampled_audios.append(audio)
                 self.num_of_files += 1
             except IOError as e:
                 print('Could not read:', audio_file, ':', e, '- it\'s ok, skipping.')
@@ -157,6 +163,7 @@ class AudioPipeline(object):
                 x_data[n][i] = chunks_X[n][i]
                 y_data[n][i] = chunks_Y[n][i]
 
+        print("x_data shape", x_data.shape)
         mean_x = np.mean(np.mean(x_data, axis=0), axis=0)  # Mean across num examples and num time steps
         # STD across num examples and num timesteps
         std_x = np.sqrt(np.mean(np.mean(np.abs(x_data - mean_x) ** 2, axis=0), axis=0))
@@ -237,7 +244,7 @@ class AudioSignal(object):
     def normalize(self):
         # normalize amplitude values to a range between -1 and 1
         self.is_normalized = True
-        self.nd_signal = self.nd_signal / float(np.max(np.abs(self.nd_signal)))
+        self.nd_signal = self.nd_signal / 32767.0 # divide by max number for 16-bit encoding
 
     @property
     def normalized_signal_matrix(self):

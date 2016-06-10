@@ -79,7 +79,7 @@ generated_seq[:][:] += mean_x
 generated_seq[:][:] *= stddev_x
 generated_seq = np.reshape(generated_seq, generated_seq.shape[0] * generated_seq.shape[1])
 print(generated_seq.shape[0])
-write_np_as_wav(generated_seq, config.frequency_of_format, 'flute_example1')
+write_np_as_wav(generated_seq, 10002, 'flute_example1')
 
 s_rate, x_signal = wav.read('flute_example1')
 print(x_signal.shape)
