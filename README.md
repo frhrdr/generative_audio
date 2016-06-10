@@ -44,6 +44,9 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 [Paper comparing different decay measures](http://www.genelec.com/documents/publications/aes110th.pdf)
 
+[Yaafe - package for audio feature extraction](http://yaafe.sourceforge.net/)
+
+
 ### Presentations
 [Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
 
