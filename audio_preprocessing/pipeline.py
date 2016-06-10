@@ -1,6 +1,6 @@
-
 from __future__ import print_function
 from cconfig import config
+from numpy.fft import fft
 import numpy as np
 import os
 import scipy.io.wavfile as wav
@@ -39,7 +39,7 @@ def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
 
 class AudioPipeline(object):
 
-    def __init__(self, folder_spec, n_to_load=1, highest_freq=440, clip_len=2):
+    def __init__(self, folder_spec='', n_to_load=1, highest_freq=440, clip_len=2, mat_dirs=None, chunks_per_sec=4):
         self.raw_audios = []
         self.num_of_files = 0
         self._sampled_audios = []
@@ -53,6 +53,18 @@ class AudioPipeline(object):
         self.block_size = 0      # to be determined later, depends on new sample rate/frequency
         self.load_data()
         self.down_sampling()
+
+        self.chunks_per_sec = chunks_per_sec
+        self._train_signal_pairs = None
+        self._train_spectra_pairs = None
+
+        if mat_dirs is not None:
+            try:
+                self._train_signal_pairs = load_matrix(mat_dirs[0], mat_dirs[1])
+                if len(mat_dirs) is 3:
+                   self._train_spectra_pairs = load_matrix(mat_dirs[0], mat_dirs[2])
+            except IOError as e:
+                print("could not read matrix or spectra files. so they were not created")
 
     def load_data(self):
 
@@ -100,13 +112,13 @@ class AudioPipeline(object):
             self._sampled_audios.append(new_audio)
             print("(old/new) shape ", self.raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
 
-    def create_train_matrix(self, f_name_out, chunks_per_sec=4):
+    def create_train_matrix(self, f_name_out=None):
         """
             This code is a modification of some of the data loading utilities of GRUV repository
              https://github.com/MattVitelli/GRUV/
         """
         # block sizes used for training - this defines the size of our input state
-        self.block_size = self.new_sample_rate / chunks_per_sec
+        self.block_size = self.new_sample_rate / self.chunks_per_sec
         # Used later for zero-padding song sequences
         max_seq_len = int(round((self.new_sample_rate * self._clip_length) / self.block_size))
         print("Using new sample rate %d and block size %d, max seq length %d" % (self.new_sample_rate, self.block_size,
@@ -148,12 +160,45 @@ class AudioPipeline(object):
         y_data[:][:] -= mean_x
         y_data[:][:] /= std_x
 
-        numpy_file = self._root_path + f_name_out + '.npy'
-        print('Save to disk (%s)...' % numpy_file)
+        self._train_signal_pairs = {'x_data': x_data, 'y_data': y_data}
 
-        obj_saved = {'x_data': x_data, 'y_data': y_data}
-        with open(numpy_file, 'wb') as fs:
-            np.savez_compressed(fs, **obj_saved)
+        if f_name_out is not None:
+            numpy_file = self._root_path + f_name_out + '.npy'
+            print('Save to disk (%s)...' % numpy_file)
+
+            with open(numpy_file, 'wb') as fs:
+                np.savez_compressed(fs, **self._train_signal_pairs)
+
+    @property
+    def train_signal_pairs(self):
+        if self._train_signal_pairs is None:
+            print("signal pairs don't exist yet. creating default.")
+            self.create_train_matrix()
+        return self._train_signal_pairs
+
+    @property
+    def train_spectra_pairs(self):
+        if self._train_spectra_pairs is None:
+            print("spectra pairs don't exist yet. creating default.")
+            self.create_train_spectra()
+        return self._train_spectra_pairs
+
+    def create_train_spectra(self, f_name_out=None):
+        x_signal = self.train_signal_pairs['x_data']
+        sign_len = x_signal.shape[-1]
+        spec_res = sign_len/2
+        x_spectra = np.abs(fft(x_signal) / sign_len)[:, :, :spec_res]
+        filler = np.zeros((x_spectra.shape[0], 1, x_spectra.shape[2]))
+        y_spectra = np.concatenate((x_spectra[:, 1:, :], filler), axis=1)
+        self._train_spectra_pairs = {'x_data': x_spectra, 'y_data': y_spectra}
+
+        if f_name_out is not None:
+            numpy_file = self._root_path + f_name_out + '.npy'
+            print('Save to disk (%s)...' % numpy_file)
+
+            with open(numpy_file, 'wb') as fs:
+                np.savez_compressed(fs, **self._train_spectra_pairs)
+
 
     def train_batches(self, a_type='sampled', batch_size=None):
         idx = 0
@@ -175,6 +220,7 @@ class AudioSignal(object):
         self.sample_rate = sample_rate
         self.duration = nd_signal.shape[0] / sample_rate
         self.is_normalized = False
+        self._spectra = None
 
     def make_matrix(self):
         return self.nd_signal.reshape((self.duration, self.sample_rate))
@@ -194,8 +240,8 @@ class AudioSignal(object):
         rest = self.sample_rate % divisor
         return self.normalized_signal_matrix[:, rest:]
 
-    def custom_matrix(self, chunks_per_sec=1):
-        dim0 = self.duration * chunks_per_sec
+    def custom_matrix(self):
+        dim0 = self.duration * self.chunks_per_sec
         dim1 = self.nd_signal.shape[0] / dim0
         sig_len = dim0 * dim1
         print(sig_len)
@@ -218,7 +264,16 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
     plt.show()
 
 
-# myAudios = AudioPipeline('D - data_flute_vib/', 2)
+myAudios = AudioPipeline('instrument_samples/flute_nonvib_wav', 10, highest_freq=5000, clip_len=2, chunks_per_sec=4)
+print(myAudios.train_spectra_pairs.keys())
+x = myAudios.train_spectra_pairs['x_data']
+y = myAudios.train_spectra_pairs['y_data']
+print(x.shape)
+
+print(y.shape)
+
+d = myAudios.train_signal_pairs['x_data']
+print(d.shape)
 # load 2 audio files
 # batches = myAudios.train_batches()
 # audio = next(batches)
