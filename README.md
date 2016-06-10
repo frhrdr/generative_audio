@@ -40,6 +40,10 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 [python - How to plot frequency spectrum?](http://glowingpython.blogspot.nl/2011/08/how-to-plot-frequency-spectrum-with.html)
 
+#### Decay Measures
+
+[Paper comparing different decay measures](http://www.genelec.com/documents/publications/aes110th.pdf)
+
 ### Presentations
 [Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
 
