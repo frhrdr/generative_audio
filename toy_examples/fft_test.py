@@ -1,6 +1,5 @@
 from audio_preprocessing.pipeline import AudioPipeline
 import numpy as np
-import matplotlib.pyplot as plt
 from numpy import sin, linspace, pi
 from pylab import plot, show, title, xlabel, ylabel, subplot
 from scipy import fft, arange
