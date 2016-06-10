@@ -66,6 +66,7 @@ class AudioPipeline(object):
 
         self.chunks_per_sec = chunks_per_sec
         self._train_signal_pairs = None
+        self.signal_mean_std = None
         self._train_spectra_pairs = None
 
         if mat_dirs is not None:
@@ -173,17 +174,20 @@ class AudioPipeline(object):
         y_data[:][:] -= mean_x
         y_data[:][:] /= std_x
 
-        numpy_file = self._root_path + f_name_out + '.npy'
-        print('Save to disk (%s)...' % numpy_file)
+        self._train_signal_pairs = {'x_data': x_data, 'y_data': y_data}
+        self.signal_mean_std = {'mean_x': mean_x, 'std_x': std_x}
 
-        obj_saved = {'x_data': x_data, 'y_data': y_data}
-        with open(numpy_file, 'wb') as fs:
-            np.savez_compressed(fs, **obj_saved)
-        # we need the mean and stddev when reconstructing the signal
-        numpy_file = self._root_path + f_name_out + '_stats.npy'
-        obj_saved = {'mean_x': mean_x, 'std_x': std_x}
-        with open(numpy_file, 'wb') as fs:
-            np.savez_compressed(fs, **obj_saved)
+        if f_name_out is not None:
+            numpy_file = self._root_path + f_name_out + '.npy'
+            print('Save to disk (%s)...' % numpy_file)
+
+            with open(numpy_file, 'wb') as fs:
+                np.savez_compressed(fs, **self._train_signal_pairs)
+            # we need the mean and stddev when reconstructing the signal
+            numpy_file = self._root_path + f_name_out + '_stats.npy'
+
+            with open(numpy_file, 'wb') as fs:
+                np.savez_compressed(fs, **self.signal_mean_std)
 
     @property
     def train_signal_pairs(self):
@@ -203,7 +207,8 @@ class AudioPipeline(object):
         x_signal = self.train_signal_pairs['x_data']
         sign_len = x_signal.shape[-1]
         spec_res = sign_len/2
-        x_spectra = np.abs(fft(x_signal) / sign_len)[:, :, :spec_res]
+        x_spectra = (fft(x_signal) / sign_len)[:, :, :spec_res]
+        x_spectra = np.concatenate((np.real(x_spectra), np.imag(x_spectra)), axis=2)
         filler = np.zeros((x_spectra.shape[0], 1, x_spectra.shape[2]))
         y_spectra = np.concatenate((x_spectra[:, 1:, :], filler), axis=1)
         self._train_spectra_pairs = {'x_data': x_spectra, 'y_data': y_spectra}
@@ -285,9 +290,7 @@ def plot_signal_simple(sig, t_range=None, p_title=None):
 # x = myAudios.train_spectra_pairs['x_data']
 # y = myAudios.train_spectra_pairs['y_data']
 # print(x.shape)
-#
 # print(y.shape)
-#
 # d = myAudios.train_signal_pairs['x_data']
 # print(d.shape)
 # load 2 audio files
