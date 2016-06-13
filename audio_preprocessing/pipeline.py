@@ -56,8 +56,8 @@ class AudioPipeline(object):
         self._offset = 2
         self._n_to_load = n_to_load
         self._folder_spec = folder_spec
-        self._clip_length = clip_len # all audio's will be cut to the same clip length (in seconds)
-        self.new_sample_rate = 0 # to be determined during down sampling method
+        self._clip_length = clip_len  # all audio's will be cut to the same clip length (in seconds)
+        self.new_sample_rate = 0  # to be determined during down sampling method
         self.block_size = 0      # to be determined later, depends on new sample rate/frequency
         self.files_to_load = None
         self.load_data()

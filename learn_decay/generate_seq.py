@@ -52,8 +52,8 @@ num_time_dimensions = x_data.shape[1]
 num_frequency_dimensions = x_data.shape[2]
 num_hidden_dimensions = 1024
 data = 'train_nonvib_flute'
-use_stateful = False
 
+use_stateful = False  # abandoned for now, because the efficiency is probably not worth the effort
 
 # load model weights
 model_path = config.datapath + data + '_weights'
@@ -89,7 +89,7 @@ else:
 
         predict_seq = model.predict(prime_sequence)
         print("predict_seq ", predict_seq.shape)
-        seq_t_plus_1 = predict_seq[0][predict_seq.shape[1] - 1][:]
+        seq_t_plus_1 = predict_seq[0, predict_seq.shape[1] - 1, :]
         generated_seq[predict_seq.shape[1]] = seq_t_plus_1
         seq_t_plus_1 = np.reshape(seq_t_plus_1, (1, 1, seq_t_plus_1.shape[0]))
         prime_sequence = np.concatenate((prime_sequence, seq_t_plus_1), axis=1)
