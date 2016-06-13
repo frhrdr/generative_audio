@@ -39,8 +39,8 @@ def generate_sequence_begin_v2(seq_length, t_data):
     return np.reshape(begin_seq, (1, begin_seq.shape[0], begin_seq.shape[1])), \
             np.reshape(total_seq, (1, total_seq.shape[0], total_seq.shape[1]))
 
-data = 'train_nonvib_flute'
-folder_spec = 'D - data_flute_nonvib/'
+data = 'cello_train'
+folder_spec = 'cello_train/'
 x_data, y_data = load_matrix(folder_spec, data)
 # add mean and stddev to signal
 mean_x, stddev_x = load_matrix(folder_spec, data + "_stats")
@@ -51,7 +51,7 @@ sequence_begin, sequence_total = generate_sequence_begin_v2(3, x_data)
 num_time_dimensions = x_data.shape[1]
 num_frequency_dimensions = x_data.shape[2]
 num_hidden_dimensions = 1024
-data = 'train_nonvib_flute'
+data = 'cello_train'
 
 use_stateful = False  # abandoned for now, because the efficiency is probably not worth the effort
 

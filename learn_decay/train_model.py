@@ -1,13 +1,16 @@
 
 from __future__ import print_function
 from lstm_utils import create_lstm_network
-from audio_preprocessing.pipeline import load_matrix
+from audio_preprocessing.pipeline import load_matrix, AudioPipeline
 from audio_preprocessing.cconfig import config
 
 
-data = 'train_nonvib_flute'
-folder_spec = 'D - data_flute_nonvib/'
+data = 'cello_train'
+folder_spec = 'cello_train/'
 # get trainings data
+myAudios = AudioPipeline(folder_spec, 90, 8000, 2, chunks_per_sec=10)
+myAudios.create_train_matrix(data)
+
 x_data, y_data = load_matrix(folder_spec, data)
 
 num_frequency_dimensions = x_data.shape[2]
