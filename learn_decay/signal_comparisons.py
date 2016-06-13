@@ -15,7 +15,9 @@ def rms_error(signal, reconstruction, verbose=False):
 
 def plot_signals(signal, reconstruction, separate=False, display=True):
     t = range(len(signal))
-
+    lost_bits = len(signal) - len(reconstruction)
+    if lost_bits > 0:
+        reconstruction = np.append(reconstruction, np.zeros((lost_bits,)))
     diff = signal - reconstruction
 
     if separate:
@@ -58,6 +60,11 @@ def plot_spectra(signal, reconstruction, sampling_freq, separate=False, display=
 
     sig_spec = np.abs(fft(signal)/n)[range(n/2)]
     rec_spec = np.abs(fft(reconstruction)/n)[range(n/2)]
+
+    lost_bits = len(signal) - len(reconstruction)
+    if lost_bits > 0:
+        rec_spec = np.append(reconstruction, np.zeros((lost_bits,)))
+
     diff_spec = sig_spec - rec_spec
     if separate:
         subplot(3, 1, 1)
