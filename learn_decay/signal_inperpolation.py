@@ -16,6 +16,7 @@ sig1 = d1[0, 2, :]
 print sig1.shape
 
 subAudios = AudioPipeline('instrument_samples/flute_nonvib_wav', 1, down_sampling=True)
+print("file names: ",subAudios.files_to_load)
 d2 = subAudios.train_signal_pairs['x_data']
 sig2 = d2[0, 2, :]
 print sig2.shape

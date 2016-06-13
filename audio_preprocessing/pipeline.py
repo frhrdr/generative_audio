@@ -59,6 +59,7 @@ class AudioPipeline(object):
         self._clip_length = clip_len # all audio's will be cut to the same clip length (in seconds)
         self.new_sample_rate = 0 # to be determined during down sampling method
         self.block_size = 0      # to be determined later, depends on new sample rate/frequency
+        self.files_to_load = None
         self.load_data()
         if self._down_sampling:
             self.down_sampling()
@@ -74,7 +75,7 @@ class AudioPipeline(object):
             try:
                 self._train_signal_pairs = load_matrix(mat_dirs[0], mat_dirs[1])
                 if len(mat_dirs) is 3:
-                   self._train_spectra_pairs = load_matrix(mat_dirs[0], mat_dirs[2])
+                    self._train_spectra_pairs = load_matrix(mat_dirs[0], mat_dirs[2])
             except IOError as e:
                 print("could not read matrix or spectra files. so they were not created")
 
@@ -82,14 +83,14 @@ class AudioPipeline(object):
 
         print("Loading audio files from: %s" % self._root_path)
         os.chdir(self._root_path)
-        files_to_load = glob.glob("*.wav")
+        self.files_to_load = glob.glob("*.wav")
         # print("# files to load %d (max to load %d)" % (len(files_to_load), self._n_to_load ))
-        if len(files_to_load) > self._n_to_load:
-            files_to_load = files_to_load[:self._n_to_load]
+        if len(self.files_to_load) > self._n_to_load:
+            self.files_to_load = self.files_to_load[:self._n_to_load]
         else:
-            self._n_to_load = len(files_to_load)
+            self._n_to_load = len(self.files_to_load)
 
-        for audio in files_to_load:
+        for audio in self.files_to_load:
             audio_file = os.path.join(self._root_path, audio)
 
             try:
