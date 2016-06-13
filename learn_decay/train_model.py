@@ -7,8 +7,12 @@ from audio_preprocessing.cconfig import config
 
 data = 'cello_train'
 folder_spec = 'cello_train/'
+data = 'train_flute'
+folder_spec = 'D - data_flute_vib/'
+max_instru_freq = 8000 # cello
+max_instru_freq = 5000
 # get trainings data
-myAudios = AudioPipeline(folder_spec, 90, 8000, 2, chunks_per_sec=10)
+myAudios = AudioPipeline(folder_spec, 90, max_instru_freq, 2, chunks_per_sec=4)
 myAudios.create_train_matrix(data)
 
 x_data, y_data = load_matrix(folder_spec, data)
