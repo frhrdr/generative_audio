@@ -6,7 +6,7 @@ from learn_decay.lstm_utils import create_lstm_network
 
 def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
                n_to_load=1, highest_freq=5000, clip_len=2, mat_dirs=None, chunks_per_sec=4,
-               down_sampling=False, root_to_folder='/instrument_samples/'):
+               down_sampling=False, root_to_folder='/instrument_samples/', save_weights=True):
 
     if matrix_file is '':
         matrix_file = train_dir
@@ -45,10 +45,9 @@ def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
 
     print('Training complete')
     w_mat_name = d_mat_name + '_' + str(n_hid) + 'hid_' + str(epochs) + 'ep'
-    model_output = config.datapath + '/weight_matrices/' + w_mat_name
-    model.save_weights(model_output, overwrite=True)
 
-
-
-# train_dir = 'cello_train'
-# train_func(train_dir, n_hid=10, epochs=1, n_to_load=10, down_sampling=True)
+    if save_weights:
+        model_output = config.datapath + '/weight_matrices/' + w_mat_name
+        model.save_weights(model_output, overwrite=True)
+        print('saved weights to: ' + model_output)
+    return model, w_mat_name
