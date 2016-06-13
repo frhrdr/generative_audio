@@ -45,7 +45,7 @@ def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
 
 class AudioPipeline(object):
 
-    def __init__(self, folder_spec='', n_to_load=1, highest_freq=440, clip_len=2, mat_dirs=None, chunks_per_sec=4,
+    def __init__(self, folder_spec='', n_to_load=1, highest_freq=5000, clip_len=2, mat_dirs=None, chunks_per_sec=4,
                  down_sampling=False):
         self._down_sampling = down_sampling
         self.raw_audios = []

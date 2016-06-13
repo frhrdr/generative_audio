@@ -52,10 +52,15 @@ num_time_dimensions = x_data.shape[1]
 num_frequency_dimensions = x_data.shape[2]
 num_hidden_dimensions = 1024
 data = 'train_nonvib_flute'
+use_stateful = False
+
 
 # load model weights
 model_path = config.datapath + data + '_weights'
-model = create_lstm_network(num_frequency_dimensions, num_hidden_dimensions)
+if use_stateful:
+    model = create_lstm_network(num_frequency_dimensions, num_hidden_dimensions, stateful=True)
+else:
+    model = create_lstm_network(num_frequency_dimensions, num_hidden_dimensions)
 model.load_weights(model_path)
 
 prime_sequence = sequence_begin.copy()
@@ -67,19 +72,28 @@ generated_seq = np.zeros((sequence_total.shape[1], sequence_total.shape[2]))
 # (1) The first step is to copy the "prime" sequence into the new generated sequence
 generated_seq[:prime_sequence.shape[1]] = prime_sequence[0][:]
 
-#
-# (2) In each step we take the last time slice x_t+1 and concatenate it to the original prime signal
-#     e.g.  Prime                           Output                  Generated sequence
-#           [x1, x2, x3]                    [x2', x3', x4']         [x1, x2, x3, x4']
-#           [x1, x2, x3, x4']               [x2', x3', x4', x5']    [x1, x2, x3, x4', x5]
-for idx in range(sequence_len - prime_sequence.shape[1]):
+# it should be possible to use stateful recursions.
 
-    predict_seq = model.predict(prime_sequence)
-    print("predict_seq ", predict_seq.shape)
-    seq_t_plus_1 = predict_seq[0][predict_seq.shape[1] - 1][:]
-    generated_seq[predict_seq.shape[1]] = seq_t_plus_1
-    seq_t_plus_1 = np.reshape(seq_t_plus_1, (1, 1, seq_t_plus_1.shape[0]))
-    prime_sequence = np.concatenate((prime_sequence, seq_t_plus_1), axis=1)
+if use_stateful:
+    for idx in range(sequence_len - prime_sequence.shape[1]):
+        predict_seq = model.predict(prime_sequence)
+        # after initial priming, only put in one time-slice at a time
+        prime_sequence = predict_seq[-1]
+else:
+    #
+    # (2) In each step we take the last time slice x_t+1 and concatenate it to the original prime signal
+    #     e.g.  Prime                           Output                  Generated sequence
+    #           [x1, x2, x3]                    [x2', x3', x4']         [x1, x2, x3, x4']
+    #           [x1, x2, x3, x4']               [x2', x3', x4', x5']    [x1, x2, x3, x4', x5]
+    for idx in range(sequence_len - prime_sequence.shape[1]):
+
+        predict_seq = model.predict(prime_sequence)
+        print("predict_seq ", predict_seq.shape)
+        seq_t_plus_1 = predict_seq[0][predict_seq.shape[1] - 1][:]
+        generated_seq[predict_seq.shape[1]] = seq_t_plus_1
+        seq_t_plus_1 = np.reshape(seq_t_plus_1, (1, 1, seq_t_plus_1.shape[0]))
+        prime_sequence = np.concatenate((prime_sequence, seq_t_plus_1), axis=1)
+
 
 
 generated_seq[:][:] += mean_x
