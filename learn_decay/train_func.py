@@ -32,6 +32,8 @@ def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
             audios.create_train_matrix(f_name_out=d_mat_name)
         else:
             print('both entered paths are invalid. No data loaded')
+            print('train directory: ', dpath)
+            print('matrix file: ', fpath)
             return
 
     x_data, y_data = load_matrix(root_to_folder + train_dir + '/', d_mat_name)
