@@ -14,19 +14,20 @@ def load_matrix(folder_spec, data):
     numpy_file = config.datapath + folder_spec + data + '.npy'
     with open(numpy_file, 'rb') as fs:
         np_data = np.load(fs)
-
+        data = []
         for obj_id in np_data:
             print(obj_id)
             if obj_id == 'x_data':
-                data1 = np_data[obj_id]
+                data.append(np_data[obj_id])
             elif obj_id == 'y_data':
-                data2 = np_data[obj_id]
+                data.append(np_data[obj_id])
             elif obj_id == 'mean_x':
-                data1 = np_data[obj_id]
+                data.append(np_data[obj_id])
             elif obj_id == 'std_x':
-                data2 = np_data[obj_id]
-
-    return data1, data2
+                data.append(np_data[obj_id])
+            elif obj_id == 'f_names':
+                data.append(np_data[obj_id])
+    return tuple(data)
 
 
 def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
@@ -185,11 +186,15 @@ class AudioPipeline(object):
 
             with open(numpy_file, 'wb') as fs:
                 np.savez_compressed(fs, **self._train_signal_pairs)
+
             # we need the mean and stddev when reconstructing the signal
             numpy_file = self._root_path + f_name_out + '_stats.npy'
-
+            stats = dict()
+            stats['mean_x'] = self.signal_mean_std['mean_x']
+            stats['std_x'] = self.signal_mean_std['std_x']
+            stats['fnames'] = self.files_to_load
             with open(numpy_file, 'wb') as fs:
-                np.savez_compressed(fs, **self.signal_mean_std)
+                np.savez_compressed(fs, **stats)
 
     @property
     def train_signal_pairs(self):
@@ -221,7 +226,6 @@ class AudioPipeline(object):
 
             with open(numpy_file, 'wb') as fs:
                 np.savez_compressed(fs, **self._train_spectra_pairs)
-
 
     def train_batches(self, a_type='sampled', batch_size=None):
         idx = 0
@@ -264,7 +268,7 @@ class AudioSignal(object):
         return self.normalized_signal_matrix[:, rest:]
 
     def custom_matrix(self):
-        dim0 = self.duration * self.chunks_per_sec
+        dim0 = self.duration  # * self.chunks_per_sec
         dim1 = self.nd_signal.shape[0] / dim0
         sig_len = dim0 * dim1
         print(sig_len)
