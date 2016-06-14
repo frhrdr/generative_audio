@@ -27,6 +27,8 @@ def load_matrix(folder_spec, data):
                 data[obj_id] = np_data[obj_id]
             elif obj_id == 'fnames':
                 data[obj_id] = np_data[obj_id]
+            elif obj_id == 'sample_rate':
+                data[obj_id] = np_data[obj_id]
     return data
 
 
@@ -193,6 +195,7 @@ class AudioPipeline(object):
             stats['mean_x'] = self.signal_mean_std['mean_x']
             stats['std_x'] = self.signal_mean_std['std_x']
             stats['fnames'] = self.files_to_load
+            stats['sample_rate'] = self.new_sample_rate
             with open(numpy_file, 'wb') as fs:
                 np.savez_compressed(fs, **stats)
 
