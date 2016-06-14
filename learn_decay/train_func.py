@@ -11,7 +11,7 @@ def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
     if matrix_file is '':
         matrix_file = train_dir
     dpath = config.datapath + root_to_folder + train_dir
-    fpath = dpath + matrix_file + '.npy'
+    fpath = dpath + '/' + matrix_file + '.npy'
 
     d_mat_name = '/' + matrix_file + '_' + str(n_to_load) + 'files_'
     if down_sampling:
@@ -41,7 +41,7 @@ def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
 
     # create model
     model = create_lstm_network(num_frequency_dimensions, n_hid)
-    print(model.summary())
+    model.summary()
     print('Start Training')
     model.fit(x_data, y_data, batch_size=batch_size, nb_epoch=epochs, verbose=1, validation_split=0.0)
 
