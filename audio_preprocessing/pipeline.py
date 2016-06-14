@@ -25,7 +25,7 @@ def load_matrix(folder_spec, data):
                 data.append(np_data[obj_id])
             elif obj_id == 'std_x':
                 data.append(np_data[obj_id])
-            elif obj_id == 'f_names':
+            elif obj_id == 'fnames':
                 data.append(np_data[obj_id])
     return tuple(data)
 
