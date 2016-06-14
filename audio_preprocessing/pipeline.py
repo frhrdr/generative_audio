@@ -14,20 +14,20 @@ def load_matrix(folder_spec, data):
     numpy_file = config.datapath + folder_spec + data + '.npy'
     with open(numpy_file, 'rb') as fs:
         np_data = np.load(fs)
-        data = []
+        data = {}
         for obj_id in np_data:
             print(obj_id)
             if obj_id == 'x_data':
-                data.append(np_data[obj_id])
+                data[obj_id] = np_data[obj_id]
             elif obj_id == 'y_data':
-                data.append(np_data[obj_id])
+                data[obj_id] = np_data[obj_id]
             elif obj_id == 'mean_x':
-                data.append(np_data[obj_id])
+                data[obj_id] = np_data[obj_id]
             elif obj_id == 'std_x':
-                data.append(np_data[obj_id])
+                data[obj_id] = np_data[obj_id]
             elif obj_id == 'fnames':
-                data.append(np_data[obj_id])
-    return tuple(data)
+                data[obj_id] = np_data[obj_id]
+    return data
 
 
 def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
