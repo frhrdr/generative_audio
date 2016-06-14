@@ -36,7 +36,10 @@ def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
             print('matrix file: ', fpath)
             return
 
-    x_data, y_data = load_matrix(root_to_folder + train_dir + '/', d_mat_name)
+        x_data, y_data = load_matrix(root_to_folder + train_dir + '/', d_mat_name)
+    else:
+        x_data, y_data = load_matrix(dpath + '/', matrix_file + '.npy')
+
     num_frequency_dimensions = x_data.shape[2]
 
     # create model
