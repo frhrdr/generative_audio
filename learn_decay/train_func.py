@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os.path
 from audio_preprocessing.cconfig import config
 from audio_preprocessing.pipeline import load_matrix, AudioPipeline
@@ -52,7 +53,15 @@ def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
     w_mat_name = d_mat_name + '_' + str(n_hid) + 'hid_' + str(epochs) + 'ep'
 
     if save_weights:
-        model_output = config.datapath + '/weight_matrices/' + w_mat_name
-        model.save_weights(model_output, overwrite=True)
-        print('saved weights to: ' + model_output)
+        json_string = model.to_json()
+        model_output = config.datapath + '/weight_matrices/' + w_mat_name + '_model.json'
+        fout = open(model_output, 'w')
+        fout.write(json_string)
+        fout.close()
+        print('saved model to: ' + model_output)
+
+        weights_output = config.datapath + '/weight_matrices/' + w_mat_name + '_weights.h5'
+        model.save_weights(weights_output, overwrite=True)
+        print('saved weights to: ' + weights_output)
+
     return model, w_mat_name
