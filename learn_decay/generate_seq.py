@@ -1,18 +1,9 @@
 from __future__ import print_function
 from audio_preprocessing.cconfig import config
-from lstm_utils import create_lstm_network
 from audio_preprocessing.pipeline import load_matrix
 import numpy as np
 import scipy.io.wavfile as wav
-from learn_decay.signal_comparisons import plot_signals
-import matplotlib.pyplot as plt
-
-
-# some parameters
-data = 'cello_train'
-folder_spec = 'cello_train/'
-data = 'train_flute'
-folder_spec = 'D - data_flute_vib/'
+from keras.models import model_from_json
 
 
 def write_np_as_wav(X, sample_rate, filename):
@@ -23,9 +14,15 @@ def write_np_as_wav(X, sample_rate, filename):
     wav.write(filename, sample_rate, Xnew)
 
 
-def generate_prime_sequence(t_data, seq_length=3):
+def generate_prime_sequence(t_data, seq_length=3, index=-1):
     # dim0 contains number of trainings examples, randomly choose one example
-    example = np.random.randint(t_data.shape[0], size=1)[0]
+    if index == -1:
+        # random sample a sound
+        example = np.random.randint(t_data.shape[0], size=1)[0]
+    else:
+        # get a specific sound
+        example = t_data[index]
+
     begin_seq = t_data[example, 0:seq_length, :]
     total_seq = t_data[example, :, :]
     return np.reshape(begin_seq, (1, begin_seq.shape[0], begin_seq.shape[1])), \
@@ -39,15 +36,14 @@ def denormalize_signal(signal, mean_s, stddev_s, max_amplitude=32767.0):
     return signal.astype('int16')
 
 
-def get_model(num_freq_dim,  num_hidden_dimensions=1024, use_stateful=False, print_sum=False):
+def get_model(l_model_name, print_sum=False):
 
-    model_path = config.datapath + data + '_weights'
-    if use_stateful:
-        l_model = create_lstm_network(num_freq_dim, num_hidden_dimensions, stateful=True)
-    else:
-        l_model = create_lstm_network(num_freq_dim, num_hidden_dimensions)
+    model_input_file = config.datapath + '/weight_matrices/' + l_model_name + "_model.json"
+    model_weights_input_file = config.datapath + '/weight_matrices/' + l_model_name + "_weights.h5"
+
+    l_model = model_from_json(model_input_file)
     # load model weights
-    l_model.load_weights(model_path)
+    l_model.load_weights(model_weights_input_file)
     if print_sum:
         l_model.summary()
     return l_model
@@ -103,16 +99,26 @@ def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stat
         return np.reshape(generated_seq, generated_seq.shape[0] * generated_seq.shape[1])
 
 
-x_test, y_test = load_matrix(folder_spec, data)
+# some parameters
+
+folder_spec = 'instrument_samples/cello_train/'
+data = 'cello_train_2files_4res_8000maxf'
+model_name = 'cello_train_2files_4res_8000maxf_1024hid_1ep'
+# General part that only needs to be executed once for generating
+# multiple sequences:
+# (1) load/get test sound signals
+# (2) load/get statistics (mean/standard deviation) to reconstruct unnormalized sound signal
+# (3) load model and weights determined in earlier training phase
+x_test, y_test = load_matrix(folder_spec, data) # f_name contains the physical file names
 # total length of the signal to be generated
 sequence_len = x_test.shape[1]
 # add mean and stddev to signal
-mean_x, stddev_x = load_matrix(folder_spec, data + "_stats")
-sequence_begin, sequence_total = generate_prime_sequence(x_test, 3)
+mean_x, stddev_x, f_name = load_matrix(folder_spec, data + "_stats")
+model = get_model(model_name, print_sum=True)
 
-
-num_frequency_dimensions = x_test.shape[2]
-model = get_model(num_frequency_dimensions, 1024, print_sum=True)
+# This part needs to be placed in a loop when generating more than one sequence
+print("Get %s sound as prime sequence " % f_name[5])
+sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=3, index=5)
 generated_sequence = generate_sequence(model, sequence_begin, sequence_len, mean_x, stddev_x)
 
 sequence_total = denormalize_signal(sequence_total, mean_x, stddev_x)
