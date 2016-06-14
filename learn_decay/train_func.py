@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os.path
+import json
 from audio_preprocessing.cconfig import config
 from audio_preprocessing.pipeline import load_matrix, AudioPipeline
 from learn_decay.lstm_utils import create_lstm_network
@@ -56,7 +57,7 @@ def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
         json_string = model.to_json()
         model_output = config.datapath + '/weight_matrices/' + w_mat_name + '_model.json'
         fout = open(model_output, 'w')
-        fout.write(json_string)
+        json.dump(json_string, fout)
         fout.close()
         print('saved model to: ' + model_output)
 
