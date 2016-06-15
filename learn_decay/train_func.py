@@ -6,7 +6,7 @@ from audio_preprocessing.pipeline import load_matrix, AudioPipeline
 from learn_decay.lstm_utils import create_lstm_network
 
 
-def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
+def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, batch_size=10,
                n_to_load=1, highest_freq=5000, clip_len=2, mat_dirs=None, chunks_per_sec=4,
                down_sampling=False, root_to_folder='/instrument_samples/', save_weights=True):
 
@@ -48,7 +48,7 @@ def train_func(train_dir, matrix_file='', n_hid=1024, epochs=100, batch_size=10,
     num_frequency_dimensions = x_data.shape[2]
 
     # create model
-    model = create_lstm_network(num_frequency_dimensions, n_hid)
+    model = create_lstm_network(num_frequency_dimensions, n_hid, n_recur)
     model.summary()
     print('Start Training')
     model.fit(x_data, y_data, batch_size=batch_size, nb_epoch=epochs, verbose=1, validation_split=0.0)

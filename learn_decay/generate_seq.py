@@ -6,6 +6,7 @@ import scipy.io.wavfile as wav
 from keras.models import model_from_json
 import json
 from learn_decay.signal_interpolation import interpolate_signal
+from learn_decay.signal_comparisons import plot_signals, plot_spectra, fit_sig_decay, plot_decays
 import os
 
 
@@ -22,7 +23,7 @@ def load_from_file(folder_specs, data, type='data'):
 def write_np_as_wav(signal, sample_rate, filename, show_filename=False):
     # up-sampling if necessary
     if sample_rate != config.frequency_of_format:
-        X = interpolate_signal(signal, sample_rate)
+        signal = interpolate_signal(signal, sample_rate)
     signal = signal.astype('int16')
     if ".wav" not in filename:
         filename += ".wav"
