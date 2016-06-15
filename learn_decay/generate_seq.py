@@ -67,7 +67,6 @@ def get_model(l_model_name, print_sum=False):
 
 def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stateful=False):
     """
-
     :param model:
     :param prime_seq:
     :param sequence_len: total length of the signal to generate
@@ -104,3 +103,24 @@ def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stat
 
         generated_seq = denormalize_signal(generated_seq, mean_s, stddev_s)
         return np.reshape(generated_seq, generated_seq.shape[0] * generated_seq.shape[1])
+
+
+def post_processing(orig_signal, gen_signal, sampling_freq, plt_signal=False,
+                            plt_spectra=False,
+                            plt_decays=False,
+                            separate=False,
+                            display=True,
+                            offset_decay=0):
+
+
+    if plt_signal:
+        plot_signals(orig_signal, gen_signal, separate, display)
+
+    if plt_spectra:
+        plot_spectra(orig_signal, gen_signal, sampling_freq, separate, display)
+    if plt_decays:
+        coeff_signal = fit_sig_decay(orig_signal[offset_decay:], s_filter=51, poly=2)
+        # coeff_recon = fit_sig_decay(gen_signal, s_filter=51, poly=2)
+        t = np.array(range(orig_signal.shape[0]), dtype=float)
+        plot_decays(orig_signal[offset_decay:], gen_signal[offset_decay:],
+                    coeff_signal, coeff_signal, separate, display=True)

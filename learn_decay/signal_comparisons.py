@@ -80,7 +80,7 @@ def plot_spectra(signal, reconstruction, sampling_freq, separate=False, display=
         # xlabel('Freq (Hz)')
         ylabel('|Y(freq)|')
         subplot(3, 1, 3)
-        title('reconstruction')
+        title('difference')
         plot(frq, diff_spec)
         xlabel('Freq (Hz)')
         ylabel('|Y(freq)|')
@@ -116,29 +116,32 @@ def fit_sig_decay(signal, s_filter=51, poly=2):
     return coefficients
 
 
-def plot_decays(t, coeff_signal, coeff_recon, separate=False, display=True):
+def plot_decays(signal, reconstruction, coeff_signal, coeff_recon, separate=False, display=True):
     """
         first calculates the data points for the exponential decay curve
         based on the coefficients (parameters).
         the plots the decay of original signal and reconstructed signal
     """
-
+    t = np.array(range(signal.shape[0]), dtype=float)
     s_data = exp_func(t, coeff_signal[0], coeff_signal[1], coeff_signal[2])
     r_data = exp_func(t, coeff_recon[0], coeff_recon[1], coeff_recon[2])
 
     if separate:
         subplot(2, 1, 1)
         title('signal decay curve')
-        plot(t, s_data)
+        plot(t, signal)
+        plot(t, s_data, 'r', linewidth=2.0)
         subplot(2, 1, 2)
         title('reconstruction decay curve')
-        plot(t, r_data)
+        plot(t, reconstruction)
+        plot(t, r_data, 'r', linewidth=2.0)
         xlabel('time')
         ylabel('freq (Hz)')
 
     else:
         subplot(1, 1, 1)
         title('signal (green), reconstruction (red) decay curve')
+        plot(t, signal)
         plot(t, s_data, 'g')
         plot(t, r_data, 'r')
         xlabel('time')
