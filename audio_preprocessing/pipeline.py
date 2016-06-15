@@ -32,7 +32,7 @@ def load_matrix(folder_spec, data):
     return data
 
 
-def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
+def convert_nd_audio_to_sample_blocks(nd_audio, block_size, max_num_samples):
     block_lists = []
     total_samples = nd_audio.shape[0]
     num_samples_so_far = 0
@@ -43,6 +43,16 @@ def convert_nd_audio_to_sample_blocks(nd_audio, block_size):
             block = np.concatenate((block, padding))
         block_lists.append(block)
         num_samples_so_far += block_size
+
+    num_of_blocks = len(block_lists)
+    if num_of_blocks < max_num_samples:
+        # pad with zero blocks
+        empty_blocks = max_num_samples - num_of_blocks
+        e_block = np.zeros(block_size)
+        block_lists.extend([e_block for i in range(empty_blocks)])
+    else:
+        # cut off some blocks
+        block_lists = block_lists[:max_num_samples]
     return block_lists
 
 
@@ -141,35 +151,20 @@ class AudioPipeline(object):
         max_seq_len = int(round((self.new_sample_rate * self._clip_length) / self.block_size))
         print("Using new sample rate %d and block size %d, max seq length %d" % (self.new_sample_rate, self.block_size,
                                                                                  max_seq_len))
-        chunks_X = []
-        chunks_Y = []
-
-        for idx, audio in enumerate(self._sampled_audios):
-            x_t = convert_nd_audio_to_sample_blocks(audio.nd_signal, self.block_size)
-            y_t = x_t[1:]
-            y_t.append(np.zeros(self.block_size))  # Add special end block composed of all zeros
-
-            cur_seq = 0
-            total_seq = len(x_t)
-            # print("total_seq ", total_seq)
-            # print("max_seq_len ", max_seq_len)
-            while cur_seq + max_seq_len < total_seq:
-                chunks_X.append(x_t[cur_seq:cur_seq + max_seq_len])
-                chunks_Y.append(y_t[cur_seq:cur_seq + max_seq_len])
-                cur_seq += max_seq_len
-
-        num_examples = len(chunks_X)
+        num_examples = len(self._sampled_audios)
         num_dims_out = self.block_size
-        print("num examples %d" % num_examples)
         out_shape = (num_examples, max_seq_len, num_dims_out)
         x_data = np.zeros(out_shape)
         y_data = np.zeros(out_shape)
-        for n in xrange(num_examples):
-            for i in xrange(max_seq_len):
-                x_data[n][i] = chunks_X[n][i]
-                y_data[n][i] = chunks_Y[n][i]
 
-        print("x_data shape", x_data.shape)
+        for idx, audio in enumerate(self._sampled_audios):
+            x_t = convert_nd_audio_to_sample_blocks(audio.nd_signal, self.block_size, max_seq_len)
+            y_t = x_t[1:]
+            y_t.append(np.zeros(self.block_size))  # Add special end block composed of all zeros
+
+            x_data[idx, :, :] = np.array(x_t)
+            y_data[idx, :, :] = np.array(y_t)
+
         mean_x = np.mean(np.mean(x_data, axis=0), axis=0)  # Mean across num examples and num time steps
         # STD across num examples and num timesteps
         std_x = np.sqrt(np.mean(np.mean(np.abs(x_data - mean_x) ** 2, axis=0), axis=0))
