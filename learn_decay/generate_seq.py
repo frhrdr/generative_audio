@@ -19,12 +19,16 @@ def load_from_file(folder_specs, data, type='data'):
         print("Not supported")
 
 
-def write_np_as_wav(X, sample_rate, filename):
-
-    Xnew = X.astype('int16')
+def write_np_as_wav(signal, sample_rate, filename, show_filename=False):
+    # up-sampling if necessary
+    if sample_rate != config.frequency_of_format:
+        X = interpolate_signal(signal, sample_rate)
+    signal = signal.astype('int16')
     if ".wav" not in filename:
         filename += ".wav"
-    wav.write(filename, sample_rate, Xnew)
+    if show_filename:
+        print("Saving file %s" % filename)
+    wav.write(filename, sample_rate, signal)
 
 
 def generate_prime_sequence(t_data, seq_length=3, index=-1):
@@ -101,17 +105,21 @@ def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stat
         return np.reshape(generated_seq, generated_seq.shape[0] * generated_seq.shape[1])
 
 
-# some parameters
-
+# parameters for generation experiment
 folder_spec = 'instrument_samples/cello_train/'
-data = 'cello_train_2files_4res_8000maxf'
-model_name = 'cello_train_2files_4res_8000maxf_1024hid_1ep'
+data = 'cello_train_86files_10res_8000maxf'
+model_name = 'cello_train_86files_10res_8000maxf_1024hid_200ep'
+num_of_tests = 2
 # General part that only needs to be executed once for generating
 # multiple sequences:
 # (1) load/get test sound signals
 # (2) load/get statistics (mean/standard deviation) to reconstruct unnormalized sound signal
 # (3) load model and weights determined in earlier training phase
-x_test, y_test = load_from_file(folder_spec, data) # f_name contains the physical file names
+x_test, _ = load_from_file(folder_spec, data) # f_name contains the physical file names
+if num_of_tests > x_test.shape[0]:
+    print("Setting number of tests to maximum %d" % x_test.shape[0])
+    num_of_tests = x_test.shape[0]
+
 # total length of the signal to be generated
 sequence_len = x_test.shape[1]
 # add mean and stddev to signal
@@ -122,16 +130,21 @@ if not os.path.exists(gen_directory):
     os.makedirs(gen_directory)
 
 # This part needs to be placed in a loop when generating more than one sequence
-test_index = 1
-print("Get %s sound as prime sequence " % f_name[test_index])
-sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=3, index=test_index)
-generated_sequence = generate_sequence(model, sequence_begin, sequence_len, mean_x, stddev_x)
+original_signal = {}
+generated_signal = {}
+for test_index in range(num_of_tests):
+    orig_signal_name = f_name[test_index]
+    print("Get %s sound as prime sequence " % orig_signal_name)
+    sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=3, index=test_index)
+    generated_sequence = generate_sequence(model, sequence_begin, sequence_len, mean_x, stddev_x)
 
-sequence_total = denormalize_signal(sequence_total, mean_x, stddev_x)
-sequence_total = np.reshape(sequence_total, sequence_total.shape[1] * sequence_total.shape[2])
-
-# plot_signals(sequence_total, generated_sequence, True)
-f_parts = f_name[test_index].split('.')
-gen_filename = gen_directory + "/" + ".".join(f_parts[:-1]) + "_gen." + f_parts[-1]
-write_np_as_wav(interpolate_signal(generated_sequence, sample_rate), config.frequency_of_format, gen_filename)
+    sequence_total = denormalize_signal(sequence_total, mean_x, stddev_x)
+    sequence_total = np.reshape(sequence_total, sequence_total.shape[1] * sequence_total.shape[2])
+    # save the two signals
+    original_signal[orig_signal_name] = sequence_total
+    generated_signal[orig_signal_name] = generated_sequence
+    # construct new wav file name for generated sequence
+    f_parts = orig_signal_name.split('.')
+    gen_filename = gen_directory + "/" + ".".join(f_parts[:-1]) + "_gen." + f_parts[-1]
+    write_np_as_wav(generated_sequence, sample_rate, gen_filename, True)
 
