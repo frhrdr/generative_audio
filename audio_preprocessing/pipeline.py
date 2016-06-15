@@ -56,10 +56,18 @@ def convert_nd_audio_to_sample_blocks(nd_audio, block_size, max_num_samples):
     return block_lists
 
 
+def add_spectrum(signal):
+    spectrum = fft(signal, axis=0)
+    spec_real = np.real(spectrum)[:int(np.ceil(len(spectrum)/2.0))]
+    spec_imag = np.imag(spectrum)[:int(np.floor(len(spectrum)/2.0))]
+
+    return np.concatenate((signal, spec_real, spec_imag), axis=0)
+
+
 class AudioPipeline(object):
 
     def __init__(self, folder_spec='', n_to_load=1, highest_freq=5000, clip_len=2, mat_dirs=None, chunks_per_sec=4,
-                 down_sampling=False):
+                 down_sampling=False, add_spectra=False):
         self._down_sampling = down_sampling
         self.raw_audios = []
         self.num_of_files = 0
@@ -83,6 +91,7 @@ class AudioPipeline(object):
         self._train_signal_pairs = None
         self.signal_mean_std = None
         self._train_spectra_pairs = None
+        self.add_spectra = add_spectra
 
         if mat_dirs is not None:
             try:
@@ -152,13 +161,17 @@ class AudioPipeline(object):
         print("Using new sample rate %d and block size %d, max seq length %d" % (self.new_sample_rate, self.block_size,
                                                                                  max_seq_len))
         num_examples = len(self._sampled_audios)
-        num_dims_out = self.block_size
-        out_shape = (num_examples, max_seq_len, num_dims_out)
+        signal_slice_len = self.block_size
+        if self.add_spectra:
+            self.block_size *= 2
+        out_shape = (num_examples, max_seq_len, self.block_size)
         x_data = np.zeros(out_shape)
         y_data = np.zeros(out_shape)
 
         for idx, audio in enumerate(self._sampled_audios):
-            x_t = convert_nd_audio_to_sample_blocks(audio.nd_signal, self.block_size, max_seq_len)
+            x_t = convert_nd_audio_to_sample_blocks(audio.nd_signal, signal_slice_len, max_seq_len)
+            if self.add_spectra:
+                x_t = map(add_spectrum, x_t)
             y_t = x_t[1:]
             y_t.append(np.zeros(self.block_size))  # Add special end block composed of all zeros
 
