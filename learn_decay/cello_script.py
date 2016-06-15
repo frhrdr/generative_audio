@@ -10,7 +10,7 @@ _, w_mat_name = train_func(train_dir,
                             n_to_load=86,
                             down_sampling=True,
                             save_weights=True,
-                            chunks_per_sec=10,
+                            chunks_per_sec=4,
                             clip_len=7)
 
 print("Saved weights to %s" % w_mat_name)

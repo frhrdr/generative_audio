@@ -29,7 +29,7 @@ def write_np_as_wav(signal, sample_rate, filename, show_filename=False):
         filename += ".wav"
     if show_filename:
         print("Saving file %s" % filename)
-    wav.write(filename, sample_rate, signal)
+    wav.write(filename, config.frequency_of_format, signal)
 
 
 def generate_prime_sequence(t_data, seq_length=3, index=-1):
