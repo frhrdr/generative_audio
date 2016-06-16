@@ -12,7 +12,7 @@ _, w_mat_name, d_mat_name = train_func(train_dir,
                                        down_sampling=True,
                                        save_weights=True,
                                        chunks_per_sec=30,
-                                       clip_len=4,
+                                       clip_len=5,
                                        n_activation='tanh')
 
 folder_spec = '/instrument_samples/cello_pizz_train/'
