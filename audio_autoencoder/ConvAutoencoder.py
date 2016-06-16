@@ -50,13 +50,13 @@ class ConvAutoencoder:
         self.autoencoder.summary()
 
     def train(self, nb_epoch, batch_size, shuffle):
-        remote = callbacks.RemoteMonitor(root='http://localhost:9000')
+        # remote = callbacks.RemoteMonitor(root='http://localhost:9000')
         self.autoencoder.fit(self.train_data, self.train_data,
                              nb_epoch=nb_epoch,
                              batch_size=batch_size,
                              shuffle=shuffle,
-                             validation_data=(self.train_data, self.train_data),
-                             callbacks=[remote])
+                             validation_data=(self.train_data, self.train_data))
+                             # callbacks=[remote])
 
     def show(self):
 

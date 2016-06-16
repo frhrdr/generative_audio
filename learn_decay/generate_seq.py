@@ -91,8 +91,8 @@ def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stat
         # (2) In each step we take the last time slice x_t+1 and concatenate it to the original prime signal
         #     e.g.  Prime                           Output                  Generated sequence
         #           [x1, x2, x3]                    [x2', x3', x4']         [x1, x2, x3, x4']
-        #           [x1, x2, x3, x4']               [x2', x3', x4', x5']    [x1, x2, x3, x4', x5]
-        for idx in range(sequence_len - prime.shape[1]):
+        #           [x1, x2, x3, x4']               [x2', x3', x4', x5']    [x1, x2, x3, x4', x5']
+        for idx in range(sequence_len - prime_seq.shape[1]):
             # print("prime ", prime.shape)
             predict_seq = model.predict(prime)
             # print("predict_seq ", predict_seq.shape)
@@ -111,7 +111,6 @@ def post_processing(orig_signal, gen_signal, sampling_freq, plt_signal=False,
                             separate=False,
                             display=True,
                             offset_decay=0):
-
 
     if plt_signal:
         plot_signals(orig_signal, gen_signal, separate, display)
