@@ -78,7 +78,7 @@ def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stat
     generated_seq = np.zeros((sequence_len, prime.shape[2]))
     #     The prime sequence contains e.g. [x1, x2, x3]
     # (1) The first step is to copy the "prime" sequence into the new generated sequence
-    generated_seq[:prime.shape[1]] = prime[0][:]
+    generated_seq[:prime.shape[1]] = prime[0, :, :]
     # it should be possible to use stateful recursions.
     # abandoned for now, because the efficiency is probably not worth the effort
     if use_stateful:

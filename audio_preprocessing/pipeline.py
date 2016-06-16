@@ -63,6 +63,8 @@ def add_spectrum(signal):
 
     return np.concatenate((signal, spec_real, spec_imag), axis=0)
 
+def remove_spectrum(sig_spec):
+    pass
 
 class AudioPipeline(object):
 
