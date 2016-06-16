@@ -7,9 +7,10 @@ from learn_decay.lstm_utils import create_lstm_network
 import numpy as np
 
 
-def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, batch_size=10,
+def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, batch_size=5,
                n_to_load=1, highest_freq=5000, clip_len=2, mat_dirs=None, chunks_per_sec=4,
-               down_sampling=False, root_to_folder='/instrument_samples/', save_weights=True, add_spectra=False):
+               down_sampling=False, root_to_folder='/instrument_samples/', save_weights=True, add_spectra=False,
+               n_activation='linear'):
 
     if matrix_file is '':
         matrix_file = train_dir
@@ -51,7 +52,7 @@ def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, bat
     num_frequency_dimensions = x_data.shape[2]
 
     # create model
-    model = create_lstm_network(num_frequency_dimensions, n_hid, n_recur)
+    model = create_lstm_network(num_frequency_dimensions, n_hid, n_recur, l_activation=n_activation)
     model.summary()
     print('Start Training')
     # if we use 1D convolution we need to reshape input

@@ -9,6 +9,16 @@ folder_spec = 'instrument_samples/guitar_train/'
 data = 'guitar_train_45files10res1400maxf'
 model_name = 'guitar_train_45files10res1400maxf_1024hid_150ep'
 
+# folder_spec = 'instrument_samples/cello_pizz_train/'
+# data = 'cello_pizz_train_90files10res8000maxf'
+# model_name = 'cello_pizz_train_90files10res8000maxf_1024hid_50ep'
+
+folder_spec = 'instrument_samples/guitar_train/'
+data = 'guitar_train_45files10res1400maxf'
+model_name = 'guitar_train_45files10res1400maxf_512hid_50ep'
+
+
+prime_length = 2
 num_of_tests = 2
 # General part that only needs to be executed once for generating
 # multiple sequences:
@@ -35,7 +45,7 @@ generated_signal = {}
 for test_index in range(num_of_tests):
     orig_signal_name = f_name[test_index]
     print("Get %s sound as prime sequence " % orig_signal_name)
-    sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=10, index=test_index)
+    sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=prime_length, index=test_index)
     generated_sequence = generate_sequence(model, sequence_begin, sequence_len, mean_x, stddev_x)
 
     sequence_total = denormalize_signal(sequence_total, mean_x, stddev_x)
