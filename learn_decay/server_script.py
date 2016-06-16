@@ -13,7 +13,7 @@ train_dir = 'cello_pizz_train'
 #                                        chunks_per_sec=30,
 #                                        clip_len=4)
 
-folder_spec = 'instrument_samples/cello_pizz_train/'
+folder_spec = '/instrument_samples/cello_pizz_train/'
 # data = d_mat_name
 # model_name = w_mat_name
 
@@ -21,7 +21,7 @@ model_name = 'cello_pizz_train_90files_30res_5000maxf_2048hid_100ep'
 data = 'cello_pizz_train_90files_30res_5000maxf'
 
 
-prime_length = 2
+prime_length = 20
 num_of_tests = 3
 gen_seq_full(folder_spec=folder_spec, data=data, model_name=model_name,
              prime_length=prime_length, num_of_tests=num_of_tests)
