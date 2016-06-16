@@ -3,7 +3,8 @@ import os.path
 import json
 from audio_preprocessing.cconfig import config
 from audio_preprocessing.pipeline import load_matrix, AudioPipeline
-from learn_decay.lstm_utils import create_lstm_network
+from learn_decay.lstm_utils import create_lstm_network, create_conv_lstm_network
+import numpy as np
 
 
 def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, batch_size=10,
@@ -50,9 +51,12 @@ def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, bat
     num_frequency_dimensions = x_data.shape[2]
 
     # create model
-    model = create_lstm_network(num_frequency_dimensions, n_hid, n_recur)
+    model = create_conv_lstm_network(num_frequency_dimensions, n_hid, n_recur)
     model.summary()
     print('Start Training')
+    x_data = np.reshape(x_data, (x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
+    y_data = np.reshape(y_data, (y_data.shape[0], y_data.shape[1], y_data.shape[2], 1))
+
     model.fit(x_data, y_data, batch_size=batch_size, nb_epoch=epochs, verbose=1, validation_split=0.0)
 
     print('Training complete')

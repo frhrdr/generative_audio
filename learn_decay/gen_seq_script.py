@@ -4,6 +4,11 @@ from generate_seq import *
 folder_spec = 'instrument_samples/cello_train/'
 data = 'cello_train_86files_10res_8000maxf'
 model_name = 'cello_train_86files_10res_8000maxf_1024hid_200ep'
+
+folder_spec = 'instrument_samples/guitar_train/'
+data = 'guitar_train_45files_raw'
+model_name = 'guitar_train_45files_raw_1024hid_100ep'
+
 num_of_tests = 2
 # General part that only needs to be executed once for generating
 # multiple sequences:
@@ -42,4 +47,6 @@ for test_index in range(num_of_tests):
     f_parts = orig_signal_name.split('.')
     gen_filename = gen_directory + "/" + ".".join(f_parts[:-1]) + "_gen." + f_parts[-1]
     write_np_as_wav(generated_sequence, sample_rate, gen_filename, True)
+    o_filename = gen_directory + "/" + orig_signal_name
+    write_np_as_wav(sequence_total, sample_rate, o_filename, True)
 

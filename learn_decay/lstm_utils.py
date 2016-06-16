@@ -1,8 +1,9 @@
 from keras.models import Sequential
 from keras.layers.wrappers import TimeDistributed
-from keras.layers.core import Dense, TimeDistributedDense
-from keras.layers.recurrent import LSTM
-
+from keras.layers.core import Dense, Flatten, Reshape
+from keras.layers.convolutional import Convolution1D, Convolution2D
+from keras.layers.recurrent import LSTM, GRU
+from keras.layers.extra import TimeDistributedFlatten
 
 # taken from MattVitelli's GRUV project
 # https://github.com/MattVitelli/GRUV/blob/master/nn_utils/network_utils.py
