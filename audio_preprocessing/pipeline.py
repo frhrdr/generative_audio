@@ -74,7 +74,7 @@ class AudioPipeline(object):
         self._sampled_audios = []
         self._root_path = config.datapath + folder_spec
         self.def_highest_freq = highest_freq
-        self._offset = 2
+        self._offset = 0
         self._n_to_load = n_to_load
         self._folder_spec = folder_spec
         self._clip_length = clip_len  # all audio's will be cut to the same clip length (in seconds)
@@ -143,6 +143,7 @@ class AudioPipeline(object):
         print("Original sample rate %d, new sample rate %d, down sampling factor %d" % (config.frequency_of_format,
                                                                                         self.new_sample_rate,
                                                                                         q))
+        self.new_sample_rate = config.frequency_of_format / q
         for i, raw_audio in enumerate(self.raw_audios):
             # use scipy.signal.decimate to down sample
             new_audio = AudioSignal(sg.decimate(raw_audio.nd_signal, q), self.new_sample_rate)
