@@ -19,8 +19,8 @@ def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, bat
 
     d_mat_name = '/' + matrix_file + '_' + str(n_to_load) + 'files'
     if down_sampling:
-        d_mat_name += str(chunks_per_sec) + 'res'
-        d_mat_name += str(highest_freq) + 'maxf'
+        d_mat_name += '_' + str(chunks_per_sec) + 'res'
+        d_mat_name += '_' + str(highest_freq) + 'maxf'
     else:
         d_mat_name += '_raw'
     if add_spectra:
