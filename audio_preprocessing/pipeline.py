@@ -63,8 +63,24 @@ def add_spectrum(signal):
 
     return np.concatenate((signal, spec_real, spec_imag), axis=0)
 
-def remove_spectrum(sig_spec):
-    pass
+
+def add_scaled_spectra(tensor1, tensor2):
+    specs1 = fft(tensor1, axis=2)
+    specs2 = fft(tensor2, axis=2)
+    max_real1 = np.abs(np.real(specs1)).max()
+    max_imag1 = np.abs(np.imag(specs1)).max()
+    max_real2 = np.abs(np.real(specs2)).max()
+    max_imag2 = np.abs(np.imag(specs2)).max()
+    max_real = max(max_real1, max_real2)
+    max_imag = max(max_imag1, max_imag2)
+    spec_real1 = np.real(specs1)[:int(np.ceil(len(specs1)/2.0))]/max_real
+    spec_imag1 = np.imag(specs1)[:int(np.floor(len(specs1)/2.0))]/max_imag
+    spec_real2 = np.real(specs2)[:int(np.ceil(len(specs2)/2.0))]/max_real
+    spec_imag2 = np.imag(specs2)[:int(np.floor(len(specs2)/2.0))]/max_imag
+    tensor1 = np.concatenate((tensor1, spec_real1, spec_imag1), axis=2)
+    tensor2 = np.concatenate((tensor2, spec_real2, spec_imag2), axis=2)
+    return tensor1, tensor2
+
 
 class AudioPipeline(object):
 
@@ -164,17 +180,12 @@ class AudioPipeline(object):
         print("Using new sample rate %d and block size %d, max seq length %d" % (self.new_sample_rate, self.block_size,
                                                                                  max_seq_len))
         num_examples = len(self._sampled_audios)
-        signal_slice_len = self.block_size
-        if self.add_spectra:
-            self.block_size *= 2
         out_shape = (num_examples, max_seq_len, self.block_size)
         x_data = np.zeros(out_shape)
         y_data = np.zeros(out_shape)
 
         for idx, audio in enumerate(self._sampled_audios):
-            x_t = convert_nd_audio_to_sample_blocks(audio.nd_signal, signal_slice_len, max_seq_len)
-            if self.add_spectra:
-                x_t = map(add_spectrum, x_t)
+            x_t = convert_nd_audio_to_sample_blocks(audio.nd_signal, self.block_size, max_seq_len)
             y_t = x_t[1:]
             y_t.append(np.zeros(self.block_size))  # Add special end block composed of all zeros
 
@@ -189,6 +200,10 @@ class AudioPipeline(object):
         x_data[:][:] /= std_x
         y_data[:][:] -= mean_x
         y_data[:][:] /= std_x
+
+        if self.add_spectra:
+            x_data, y_data = add_scaled_spectra(x_data, y_data)
+            self.block_size *= 2
 
         self._train_signal_pairs = {'x_data': x_data, 'y_data': y_data}
         self.signal_mean_std = {'mean_x': mean_x, 'std_x': std_x}

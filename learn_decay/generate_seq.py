@@ -65,7 +65,7 @@ def get_model(l_model_name, print_sum=False):
     return l_model
 
 
-def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stateful=False):
+def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stateful=False, add_spectra=False):
     """
     :param model:
     :param prime_seq:
@@ -100,6 +100,10 @@ def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stat
             generated_seq[predict_seq.shape[1]] = seq_t_plus_1
             seq_t_plus_1 = np.reshape(seq_t_plus_1, (1, 1, seq_t_plus_1.shape[0]))
             prime = np.concatenate((prime, seq_t_plus_1), axis=1)
+
+        if add_spectra:
+            spec_cut = generated_seq.shape[1]/2
+            generated_seq = generated_seq[:, :spec_cut]
 
         generated_seq = denormalize_signal(generated_seq, mean_s, stddev_s)
         return np.reshape(generated_seq, generated_seq.shape[0] * generated_seq.shape[1])
