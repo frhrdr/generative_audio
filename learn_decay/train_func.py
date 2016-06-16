@@ -76,4 +76,4 @@ def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, bat
         model.save_weights(weights_output, overwrite=True)
         print('saved weights to: ' + weights_output)
 
-    return model, w_mat_name
+    return model, w_mat_name, d_mat_name
