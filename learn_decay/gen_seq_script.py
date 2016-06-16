@@ -1,7 +1,7 @@
 from generate_seq import *
 
 # parameters for generation experiment
-folder_spec = 'instrument_samples/cello_train/'
+folder_spec = 'instrument_samples/cello_arco_train/'
 data = 'cello_train_86files_10res_8000maxf'
 model_name = 'cello_train_86files_10res_8000maxf_1024hid_200ep'
 

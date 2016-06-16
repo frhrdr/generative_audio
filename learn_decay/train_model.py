@@ -5,8 +5,8 @@ from audio_preprocessing.pipeline import load_matrix, AudioPipeline
 from audio_preprocessing.cconfig import config
 
 
-data = 'cello_train'
-folder_spec = 'cello_train/'
+data = 'cello_arco_train'
+folder_spec = 'cello_arco_train/'
 data = 'train_flute'
 folder_spec = 'D - data_flute_vib/'
 max_instru_freq = 8000 # cello
