@@ -32,7 +32,7 @@ def write_np_as_wav(signal, sample_rate, filename, show_filename=False):
     wav.write(filename, config.frequency_of_format, signal)
 
 
-def generate_prime_sequence(t_data, seq_length=3, index=-1):
+def generate_prime_sequence(t_data, seq_length=3, index=-1, add_spectra=False):
     # dim0 contains number of trainings examples, randomly choose one example
     if index == -1:
         # random sample a sound
@@ -40,6 +40,9 @@ def generate_prime_sequence(t_data, seq_length=3, index=-1):
 
     begin_seq = t_data[index, 0:seq_length, :]
     total_seq = t_data[index, :, :]
+    if add_spectra:
+        spec_cut = t_data.shape[2]/2
+        total_seq = t_data[index, :, :spec_cut]
     return np.reshape(begin_seq, (1, begin_seq.shape[0], begin_seq.shape[1])), \
             np.reshape(total_seq, (1, total_seq.shape[0], total_seq.shape[1]))
 
@@ -156,13 +159,11 @@ def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_
     for test_index in range(num_of_tests):
         orig_signal_name = f_name[test_index]
         print("Get %s sound as prime sequence " % orig_signal_name)
-        sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=prime_length, index=test_index)
+        sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=prime_length, index=test_index,
+                                                                 add_spectra=add_spectra)
         generated_sequence = generate_sequence(model, sequence_begin, sequence_len, mean_x, stddev_x,
                                                add_spectra=add_spectra)
 
-        if add_spectra:
-            spec_cut = sequence_total.shape[1]/2
-            sequence_total = sequence_total[:, :spec_cut]
 
         sequence_total = denormalize_signal(sequence_total, mean_x, stddev_x)
         sequence_total = np.reshape(sequence_total, sequence_total.shape[1] * sequence_total.shape[2])
