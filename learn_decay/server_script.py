@@ -1,12 +1,13 @@
 from train_func import train_func
 from generate_seq import gen_seq_full
-train = False
+
+train = True
 if train:
     train_dir = 'guitar_train'
     _, w_mat_name, d_mat_name = train_func(train_dir,
                                            n_hid_neurons=2048,
                                            n_rec_layers=1,
-                                           epochs=100,
+                                           epochs=1,
                                            highest_freq=1400,
                                            n_to_load=45,
                                            down_sampling=True,

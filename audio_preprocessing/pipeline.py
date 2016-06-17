@@ -17,7 +17,7 @@ def load_matrix(folder_spec, data):
         np_data = np.load(fs)
         data = {}
         for obj_id in np_data:
-            print(obj_id)
+            # print(obj_id)
             if obj_id == 'x_data':
                 data[obj_id] = np_data[obj_id]
             elif obj_id == 'y_data':
@@ -172,7 +172,7 @@ class AudioPipeline(object):
             # use scipy.signal.decimate to down sample
             new_audio = AudioSignal(sg.decimate(raw_audio.nd_signal, q), self.new_sample_rate)
             self._sampled_audios.append(new_audio)
-            print("(old/new) shape ", self.raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
+            # print("(old/new) shape ", self.raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
 
     def create_train_matrix(self, f_name_out=None):
         """
@@ -199,6 +199,7 @@ class AudioPipeline(object):
             y_data[idx, :, :] = np.array(y_t)
 
         mean_x = np.mean(np.mean(x_data, axis=0), axis=0)  # Mean across num examples and num time steps
+        print('mean: ', mean)
         # STD across num examples and num timesteps
         std_x = np.sqrt(np.mean(np.mean(np.abs(x_data - mean_x) ** 2, axis=0), axis=0))
         std_x = np.maximum(1.0e-8, std_x)  # Clamp variance if too tiny
