@@ -74,10 +74,10 @@ def add_scaled_spectra(tensor1, tensor2):
     max_imag2 = np.abs(np.imag(specs2)).max()
     max_real = max(max_real1, max_real2)
     max_imag = max(max_imag1, max_imag2)
-    spec_real1 = np.real(specs1)[:int(np.ceil(len(specs1)/2.0))]/max_real
-    spec_imag1 = np.imag(specs1)[:int(np.floor(len(specs1)/2.0))]/max_imag
-    spec_real2 = np.real(specs2)[:int(np.ceil(len(specs2)/2.0))]/max_real
-    spec_imag2 = np.imag(specs2)[:int(np.floor(len(specs2)/2.0))]/max_imag
+    spec_real1 = np.real(specs1)[:, :, :int(np.ceil(specs1.shape[2]/2.0))]/max_real
+    spec_imag1 = np.imag(specs1)[:, :, :int(np.floor(specs1.shape[2]/2.0))]/max_imag
+    spec_real2 = np.real(specs2)[:, :, :int(np.ceil(specs2.shape[2]/2.0))]/max_real
+    spec_imag2 = np.imag(specs2)[:, :, :int(np.floor(specs2.shape[2]/2.0))]/max_imag
     tensor1 = np.concatenate((tensor1, spec_real1, spec_imag1), axis=2)
     tensor2 = np.concatenate((tensor2, spec_real2, spec_imag2), axis=2)
     return tensor1, tensor2

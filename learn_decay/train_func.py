@@ -53,7 +53,7 @@ def train_func(train_dir, matrix_file='', n_hid_neurons=1024, n_rec_layers=1, ep
     num_frequency_dimensions = x_data.shape[2]
 
     # create model
-    model = create_lstm_network(num_frequency_dimensions, n_hid_neurons, n_rec_layers, l_activation=n_activation)
+    model = create_lstm_network(num_frequency_dimensions, n_hid_neurons, n_rec_layers, l_activation=activation)
     model.summary()
     print('Start Training')
     # if we use 1D convolution we need to reshape input
