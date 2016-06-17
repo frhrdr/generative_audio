@@ -3,6 +3,7 @@ from cconfig import config
 from numpy.fft import fft
 import numpy as np
 import os
+import wave
 import scipy.io.wavfile as wav
 import scipy.signal as sg
 import glob
@@ -132,10 +133,15 @@ class AudioPipeline(object):
 
         for audio in self.files_to_load:
             audio_file = os.path.join(self._root_path, audio)
-
+            print(audio)
             try:
                 # read file
+                #w = wave.open(audio_file)
+                #sample_rate = w.getframerate()
                 sample_rate, nd_audio = wav.read(audio_file)
+                #nchan = w.getnchannels()
+                #bit_audio = w.readframes(nchan * w.getnframes())
+
                 # some of the samples we use are recorded in stereo, but the signal is actually mono
                 # so we can just skip one channel
                 if nd_audio.ndim > 1:

@@ -4,16 +4,17 @@ from generate_seq import gen_seq_full
 
 train_dir = 'piano_train'
 _, w_mat_name, d_mat_name = train_func(train_dir,
-                                       n_hid=2048,
-                                       n_recur=1,
-                                       epochs=100,
+                                       n_hid_neurons=512,
+                                       n_rec_layers=1,
+                                       epochs=1,
                                        highest_freq=4200,
-                                       n_to_load=88,
+                                       n_to_load=8,
                                        down_sampling=True,
                                        save_weights=True,
                                        chunks_per_sec=30,
                                        clip_len=5,
-                                       n_activation='tanh')
+                                       add_spectra=True,
+                                       activation='tanh')
 
 folder_spec = '/instrument_samples/cello_pizz_train/'
 data = d_mat_name
