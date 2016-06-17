@@ -142,6 +142,7 @@ def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_
 
     # total length of the signal to be generated
     sequence_len = x_test.shape[1]
+    block_size = x_test.shape[2]
     # add mean and stddev to signal
     mean_x, stddev_x, f_name, sample_rate = load_from_file(folder_spec, data + "_stats", "stats")
     model = get_model(model_name, print_sum=True)
@@ -168,6 +169,8 @@ def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_
         f_parts = orig_signal_name.split('.')
         gen_filename = gen_directory + "/" + ".".join(f_parts[:-1]) + "_gen." + f_parts[-1]
         write_np_as_wav(generated_sequence, sample_rate, gen_filename, True)
+        gen_filename = gen_directory + "/" + ".".join(f_parts[:-1]) + "_gen_wp." + f_parts[-1]
+        write_np_as_wav(generated_sequence[(prime_length * block_size):], sample_rate, gen_filename, True)
         o_filename = gen_directory + "/" + orig_signal_name
         write_np_as_wav(sequence_total, sample_rate, o_filename, True)
 
