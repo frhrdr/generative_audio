@@ -7,10 +7,10 @@ from learn_decay.lstm_utils import create_lstm_network
 import numpy as np
 
 
-def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, batch_size=5,
+def train_func(train_dir, matrix_file='', n_hid_neurons=1024, n_rec_layers=1, epochs=100, batch_size=5,
                n_to_load=1, highest_freq=5000, clip_len=2, mat_dirs=None, chunks_per_sec=4,
                down_sampling=False, root_to_folder='/instrument_samples/', save_weights=True, add_spectra=False,
-               n_activation='linear'):
+               activation='linear'):
 
     if matrix_file is '':
         matrix_file = train_dir
@@ -18,6 +18,7 @@ def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, bat
     fpath = dpath + '/' + matrix_file + '.npy'
 
     d_mat_name = '/' + matrix_file + '_' + str(n_to_load) + 'files'
+    d_mat_name += '_' + str(clip_len) + 'sec'
     if down_sampling:
         d_mat_name += '_' + str(chunks_per_sec) + 'res'
         d_mat_name += '_' + str(highest_freq) + 'maxf'
@@ -52,7 +53,7 @@ def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, bat
     num_frequency_dimensions = x_data.shape[2]
 
     # create model
-    model = create_lstm_network(num_frequency_dimensions, n_hid, n_recur, l_activation=n_activation)
+    model = create_lstm_network(num_frequency_dimensions, n_hid_neurons, n_rec_layers, l_activation=n_activation)
     model.summary()
     print('Start Training')
     # if we use 1D convolution we need to reshape input
@@ -62,7 +63,8 @@ def train_func(train_dir, matrix_file='', n_hid=1024, n_recur=1, epochs=100, bat
     model.fit(x_data, y_data, batch_size=batch_size, nb_epoch=epochs, verbose=1, validation_split=0.0)
 
     print('Training complete')
-    w_mat_name = d_mat_name + '_' + str(n_hid) + 'hid_' + str(epochs) + 'ep'
+    w_mat_name = d_mat_name + '_' + str(n_hid_neurons) + 'hid_' + str(n_rec_layers) + 'lyrs'
+    w_mat_name += '_' + str(epochs) + 'ep_' + str(activation) + 'act'
 
     if save_weights:
         json_string = model.to_json()
