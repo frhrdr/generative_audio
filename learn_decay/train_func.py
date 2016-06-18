@@ -3,7 +3,7 @@ import os.path
 import json
 from audio_preprocessing.cconfig import config
 from audio_preprocessing.pipeline import load_matrix, AudioPipeline
-from learn_decay.lstm_utils import create_lstm_network
+from learn_decay.lstm_utils import create_lstm_network, create_conv_lstm_network
 import numpy as np
 
 
@@ -51,9 +51,15 @@ def train_func(train_dir, matrix_file='', n_hid_neurons=1024, n_rec_layers=1, ep
     y_data = data['y_data']
 
     num_frequency_dimensions = x_data.shape[2]
-
     # create model
-    model = create_lstm_network(num_frequency_dimensions, n_hid_neurons, n_rec_layers, l_activation=activation)
+    if architecture == '1':
+        model = create_lstm_network(num_frequency_dimensions, n_hid_neurons, n_rec_layers, l_activation=activation)
+
+    elif architecture == '2':
+        y_data = x_data[:, :, :]
+        x_data = np.reshape(x_data, (x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
+        model = create_conv_lstm_network(num_frequency_dimensions, n_hid_neurons, n_rec_layers)
+
     model.summary()
     print('Start Training')
     # if we use 1D convolution we need to reshape input
