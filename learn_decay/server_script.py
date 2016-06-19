@@ -15,6 +15,7 @@ if train:
                                            chunks_per_sec=40,
                                            clip_len=5,
                                            add_spectra=True,
+                                           architecture='1',
                                            activation='linear')
 
     folder_spec = '/instrument_samples/guitar_train/'
