@@ -164,7 +164,6 @@ def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_
         generated_sequence = generate_sequence(model, sequence_begin, sequence_len, mean_x, stddev_x,
                                                add_spectra=add_spectra)
 
-
         sequence_total = denormalize_signal(sequence_total, mean_x, stddev_x)
         sequence_total = np.reshape(sequence_total, sequence_total.shape[1] * sequence_total.shape[2])
         # save the two signals
