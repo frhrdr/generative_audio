@@ -198,12 +198,12 @@ class AudioPipeline(object):
             x_data[idx, :, :] = np.array(x_t)
             y_data[idx, :, :] = np.array(y_t)
 
-        #mean_x = np.mean(np.mean(x_data, axis=0), axis=0)  # Mean across num examples and num time steps
-        mean_x = 0.0
+        mean_x = np.mean(np.mean(np.mean(x_data, axis=0), axis=0), axis=0)  # Mean across num examples and num time steps
+        # mean_x = 0.0
         # STD across num examples and num timesteps
-        #std_x = np.sqrt(np.mean(np.mean(np.abs(x_data - mean_x) ** 2, axis=0), axis=0))
-        #std_x = np.maximum(1.0e-8, std_x)  # Clamp variance if too tiny
-        std_x = 1
+        std_x = np.sqrt(np.mean(np.mean(np.mean(x_data, axis=0), axis=0), axis=0))
+        std_x = np.maximum(1.0e-8, std_x)  # Clamp variance if too tiny
+        # std_x = 1
         x_data[:][:] -= mean_x
         x_data[:][:] /= std_x
         y_data[:][:] -= mean_x
