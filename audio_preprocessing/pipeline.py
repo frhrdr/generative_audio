@@ -201,8 +201,15 @@ class AudioPipeline(object):
         mean_x = np.mean(np.mean(np.mean(x_data, axis=0), axis=0), axis=0)
         # mean_x = 0.0
         # STD across across all tensor axis
-        std_x = np.sqrt(np.mean(np.mean(np.mean(x_data, axis=0), axis=0), axis=0))
-        std_x = np.maximum(1.0e-8, std_x)  # Clamp variance if too tiny
+        std_x = np.sqrt(np.mean(np.mean(np.mean(np.abs(x_data - mean_x) ** 2, axis=0), axis=0), axis=0))
+        if np.isnan(std_x):
+            # what is the right thing to do if the stddev results in "nan" value?
+            std_x = 1.0e-8
+        else:
+            std_x = np.maximum(1.0e-8, std_x)  # Clamp variance if too tiny
+
+        print("mean_x and std_x ", mean_x, std_x)
+
         # std_x = 1
         x_data[:][:] -= mean_x
         x_data[:][:] /= std_x
