@@ -132,7 +132,7 @@ def post_processing(orig_signal, gen_signal, sampling_freq, plt_signal=False,
                     coeff_signal, coeff_signal, separate, display=True)
 
 
-def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_spectra=False):
+def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_spectra=False, mean_std_per_file=False):
     # General part that only needs to be executed once for generating
     # multiple sequences:
     # (1) load/get test sound signals
@@ -161,6 +161,10 @@ def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_
         print("Get %s sound as prime sequence " % orig_signal_name)
         sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=prime_length, index=test_index,
                                                                  add_spectra=add_spectra)
+        if mean_std_per_file:
+            mean_x = mean_x[test_index]
+            stddev_x = stddev_x[test_index]
+
         generated_sequence = generate_sequence(model, sequence_begin, sequence_len, mean_x, stddev_x,
                                                add_spectra=add_spectra)
 

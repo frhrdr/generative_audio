@@ -174,7 +174,7 @@ class AudioPipeline(object):
             self._sampled_audios.append(new_audio)
             # print("(old/new) shape ", self.raw_audios[i].nd_signal.shape, self._sampled_audios[i].nd_signal.shape)
 
-    def create_train_matrix(self, f_name_out=None):
+    def create_train_matrix(self, f_name_out=None, mean_std_per_file=False):
         """
             This code is a modification of some of the data loading utilities of GRUV repository
              https://github.com/MattVitelli/GRUV/
@@ -207,7 +207,7 @@ class AudioPipeline(object):
         else:
             std_x = np.maximum(1.0e-8, std_x)  # Clamp variance if too tiny
 
-        if True:
+        if mean_std_per_file:
             mean_x = np.mean(np.mean(x_data, axis=1), axis=1)
             mean_x = np.reshape(mean_x, (len(mean_x), 1, 1))
 
