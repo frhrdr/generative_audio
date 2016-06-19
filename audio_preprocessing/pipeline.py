@@ -197,16 +197,24 @@ class AudioPipeline(object):
 
             x_data[idx, :, :] = np.array(x_t)
             y_data[idx, :, :] = np.array(y_t)
-        # Mean across all tensor axis
+
         mean_x = np.mean(np.mean(np.mean(x_data, axis=0), axis=0), axis=0)
-        # mean_x = 0.0
-        # STD across across all tensor axis
         std_x = np.sqrt(np.mean(np.mean(np.mean(np.abs(x_data - mean_x) ** 2, axis=0), axis=0), axis=0))
+
         if np.isnan(std_x):
             # what is the right thing to do if the stddev results in "nan" value?
             std_x = 1.0e-8
         else:
             std_x = np.maximum(1.0e-8, std_x)  # Clamp variance if too tiny
+
+        if True:
+            mean_x = np.mean(np.mean(x_data, axis=1), axis=1)
+            mean_x = np.reshape(mean_x, (len(mean_x), 1, 1))
+
+            std_x = np.std(np.reshape(x_data, (x_data.shape[0], -1)), axis=1)
+            std_x = np.where(std_x > 1.0e-8, std_x, 1.0e-8 * np.ones(std_x.shape))
+            # note: NaN > x always returns false and is caught here as well.
+            std_x = np.reshape(std_x, (len(std_x), 1, 1))
 
         print("mean_x and std_x ", mean_x, std_x)
 
