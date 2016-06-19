@@ -10,7 +10,7 @@ import numpy as np
 def train_func(train_dir, matrix_file='', n_hid_neurons=1024, n_rec_layers=1, epochs=100, batch_size=5,
                n_to_load=1, highest_freq=5000, clip_len=2, mat_dirs=None, chunks_per_sec=4,
                down_sampling=False, root_to_folder='/instrument_samples/', save_weights=True, add_spectra=False,
-               activation='linear', architecture=1):
+               activation='linear', architecture=1, mean_std_per_file=False):
 
     if matrix_file is '':
         matrix_file = train_dir
@@ -36,7 +36,7 @@ def train_func(train_dir, matrix_file='', n_hid_neurons=1024, n_rec_layers=1, ep
                                    clip_len=clip_len, mat_dirs=mat_dirs, chunks_per_sec=chunks_per_sec,
                                    down_sampling=down_sampling, add_spectra=add_spectra)
 
-            audios.create_train_matrix(f_name_out=d_mat_name)
+            audios.create_train_matrix(f_name_out=d_mat_name, mean_std_per_file=mean_std_per_file)
         else:
             print('both entered paths are invalid. No data loaded')
             print('train directory: ', dpath)
