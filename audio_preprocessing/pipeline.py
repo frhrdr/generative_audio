@@ -216,7 +216,7 @@ class AudioPipeline(object):
             # note: NaN > x always returns false and is caught here as well.
             std_x = np.reshape(std_x, (len(std_x), 1, 1))
 
-        print("mean_x and std_x ", mean_x, std_x)
+        # print("mean_x and std_x ", mean_x.shape, std_x.shape)
 
         # std_x = 1
         x_data[:][:] -= mean_x
