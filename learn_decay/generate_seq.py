@@ -32,7 +32,7 @@ def write_np_as_wav(signal, sample_rate, filename, show_filename=False):
     wav.write(filename, config.frequency_of_format, signal)
 
 
-def generate_prime_sequence(t_data, seq_length=3, index=-1, add_spectra=False):
+def generate_prime_sequence(t_data, seq_length=3, index=-1, architecture='1', add_spectra=False):
     # dim0 contains number of trainings examples, randomly choose one example
     if index == -1:
         # random sample a sound
@@ -43,8 +43,14 @@ def generate_prime_sequence(t_data, seq_length=3, index=-1, add_spectra=False):
     if add_spectra:
         spec_cut = t_data.shape[2]/2
         total_seq = t_data[index, :, :spec_cut]
-    return np.reshape(begin_seq, (1, begin_seq.shape[0], begin_seq.shape[1])), \
-            np.reshape(total_seq, (1, total_seq.shape[0], total_seq.shape[1]))
+    if architecture == '1':
+        prime = np.reshape(begin_seq, (1, begin_seq.shape[0], begin_seq.shape[1]))
+        comp_sequence = np.reshape(total_seq, (1, total_seq.shape[0], total_seq.shape[1]))
+    elif architecture == '2':
+        prime = np.reshape(begin_seq, (1, begin_seq.shape[0], begin_seq.shape[1], 1))
+        comp_sequence = np.reshape(total_seq, (1, total_seq.shape[0], total_seq.shape[1], 1))
+    return prime, comp_sequence
+
 
 
 def denormalize_signal(signal, mean_s, stddev_s, max_amplitude=32767.0):
@@ -68,7 +74,7 @@ def get_model(l_model_name, print_sum=False):
     return l_model
 
 
-def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stateful=False, add_spectra=False):
+def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, architecture, use_stateful=False, add_spectra=False):
     """
     :param model:
     :param prime_seq:
@@ -81,7 +87,11 @@ def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stat
     generated_seq = np.zeros((sequence_len, prime.shape[2]))
     #     The prime sequence contains e.g. [x1, x2, x3]
     # (1) The first step is to copy the "prime" sequence into the new generated sequence
-    generated_seq[:prime.shape[1]] = prime[0, :, :]
+    if architecture == '1':
+        generated_seq[:prime.shape[1]] = prime[0, :, :]
+    elif architecture == '2':
+        generated_seq[:prime.shape[1]] = prime[0, :, :, 0]
+
     # it should be possible to use stateful recursions.
     # abandoned for now, because the efficiency is probably not worth the effort
     if use_stateful:
@@ -101,13 +111,15 @@ def generate_sequence(model, prime_seq, sequence_len, mean_s, stddev_s, use_stat
             # print("predict_seq ", predict_seq.shape)
             seq_t_plus_1 = predict_seq[0, predict_seq.shape[1] - 1, :]
             generated_seq[predict_seq.shape[1]] = seq_t_plus_1
-            seq_t_plus_1 = np.reshape(seq_t_plus_1, (1, 1, seq_t_plus_1.shape[0]))
+            if architecture == '1':
+                seq_t_plus_1 = np.reshape(seq_t_plus_1, (1, 1, seq_t_plus_1.shape[0]))
+            elif architecture == '2':
+                seq_t_plus_1 = np.reshape(seq_t_plus_1, (1, 1, seq_t_plus_1.shape[0], 1))
             prime = np.concatenate((prime, seq_t_plus_1), axis=1)
 
         if add_spectra:
             spec_cut = generated_seq.shape[1]/2
             generated_seq = generated_seq[:, :spec_cut]
-
         generated_seq = denormalize_signal(generated_seq, mean_s, stddev_s)
         return np.reshape(generated_seq, generated_seq.shape[0] * generated_seq.shape[1])
 
@@ -132,7 +144,8 @@ def post_processing(orig_signal, gen_signal, sampling_freq, plt_signal=False,
                     coeff_signal, coeff_signal, separate, display=True)
 
 
-def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_spectra=False, mean_std_per_file=False):
+def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_spectra=False, mean_std_per_file=False,
+                                                                                architecture='1'):
     # General part that only needs to be executed once for generating
     # multiple sequences:
     # (1) load/get test sound signals
@@ -160,15 +173,18 @@ def gen_seq_full(folder_spec, data, model_name, prime_length, num_of_tests, add_
         orig_signal_name = f_name[test_index]
         print("Get %s sound as prime sequence " % orig_signal_name)
         sequence_begin, sequence_total = generate_prime_sequence(x_test, seq_length=prime_length, index=test_index,
-                                                                 add_spectra=add_spectra)
+                                                                 architecture=architecture,   add_spectra=add_spectra)
         if mean_std_per_file:
-            mean_x = mean_x[test_index]
-            stddev_x = stddev_x[test_index]
+            f_mean_x = mean_x[test_index]
+            f_stddev_x = stddev_x[test_index]
+        else:
+            f_mean_x = mean_x
+            f_stddev_x = stddev_x
 
-        generated_sequence = generate_sequence(model, sequence_begin, sequence_len, mean_x, stddev_x,
-                                               add_spectra=add_spectra)
+        generated_sequence = generate_sequence(model, sequence_begin, sequence_len, f_mean_x, f_stddev_x,
+                                               architecture, add_spectra=add_spectra)
 
-        sequence_total = denormalize_signal(sequence_total, mean_x, stddev_x)
+        sequence_total = denormalize_signal(sequence_total, f_mean_x, f_stddev_x)
         sequence_total = np.reshape(sequence_total, sequence_total.shape[1] * sequence_total.shape[2])
         # save the two signals
         original_signal[orig_signal_name] = sequence_total
