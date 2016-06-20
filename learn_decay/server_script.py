@@ -6,15 +6,15 @@ if train:
     train_dir = 'guitar_train'
     _, w_mat_name, d_mat_name = train_func(train_dir,
                                            n_hid_neurons=512,
-                                           n_rec_layers=2,
+                                           n_rec_layers=1,
                                            epochs=100,
                                            highest_freq=1400,
                                            n_to_load=45,
                                            down_sampling=True,
                                            save_weights=True,
-                                           chunks_per_sec=40,
+                                           chunks_per_sec=60,
                                            clip_len=5,
-                                           add_spectra=False,
+                                           add_spectra=True,
                                            architecture='1',
                                            mean_std_per_file=True,
                                            activation='linear')
@@ -28,7 +28,7 @@ else:
 
 folder_spec = '/instrument_samples/guitar_train/'
 
-prime_length = 40
+prime_length = 20
 num_of_tests = 3
 gen_seq_full(folder_spec=folder_spec, data=data, model_name=model_name,
              prime_length=prime_length, num_of_tests=num_of_tests, add_spectra=True, mean_std_per_file=True)
