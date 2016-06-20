@@ -33,11 +33,13 @@ def create_conv_lstm_network(num_frequency_dimensions, num_hidden_dimensions,
     model.add(TimeDistributed(Convolution1D(32, 35, border_mode='same', name="1_conv1d", activation='relu'),
                               input_shape=(None, num_frequency_dimensions, 1), name="1_timedist"))
     model.add(TimeDistributed(BatchNormalization()))
-    # model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
-    # model.add(TimeDistributed(Convolution1D(8, 3, border_mode='same', name="2_conv1d", activation='relu'),
-    #                          input_shape=(None, num_frequency_dimensions, 1), name="2_timedist"))
-    # model.add(TimeDistributed(BatchNormalization()))
-    # model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
+    model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
+    model.add(TimeDistributed(Convolution1D(16, 7, activation='relu', border_mode='same')))
+    model.add(TimeDistributed(BatchNormalization()))
+    model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
+    model.add(TimeDistributed(Convolution1D(4, 3, activation='relu', border_mode='same')))
+    model.add(TimeDistributed(BatchNormalization()))
+    model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
     model.add(TimeDistributed(Flatten()))
 
     for cur_unit in xrange(num_recurrent_units):
