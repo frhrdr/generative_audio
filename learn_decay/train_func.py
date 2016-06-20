@@ -56,16 +56,11 @@ def train_func(train_dir, matrix_file='', n_hid_neurons=1024, n_rec_layers=1, ep
         model = create_lstm_network(num_frequency_dimensions, n_hid_neurons, n_rec_layers, l_activation=activation)
 
     elif architecture == '2':
-        y_data = x_data[:, :, :]
         x_data = np.reshape(x_data, (x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
         model = create_conv_lstm_network(num_frequency_dimensions, n_hid_neurons, n_rec_layers)
 
     model.summary()
     print('Start Training')
-    # if we use 1D convolution we need to reshape input
-    # x_data = np.reshape(x_data, (x_data.shape[0], x_data.shape[1], x_data.shape[2], 1))
-    # y_data = np.reshape(y_data, (y_data.shape[0], y_data.shape[1], y_data.shape[2], 1))
-
     model.fit(x_data, y_data, batch_size=batch_size, nb_epoch=epochs, verbose=1, validation_split=0.0)
 
     print('Training complete')
