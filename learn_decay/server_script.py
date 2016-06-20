@@ -9,7 +9,7 @@ if train:
                                            n_rec_layers=2,
                                            epochs=100,
                                            highest_freq=1400,
-                                           n_to_load=5,
+                                           n_to_load=45,
                                            down_sampling=True,
                                            save_weights=True,
                                            chunks_per_sec=40,
