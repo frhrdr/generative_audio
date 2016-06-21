@@ -232,6 +232,7 @@ class AudioPipeline(object):
         self.signal_mean_std = {'mean_x': mean_x, 'std_x': std_x}
 
         if f_name_out is not None:
+            f_name_out.replace('/', '_')  # just in case it happens to be a path
             numpy_file = self._root_path + f_name_out + '.npy'
             print('Save to disk (%s)...' % numpy_file)
 
