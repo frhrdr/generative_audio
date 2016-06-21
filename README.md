@@ -65,6 +65,7 @@ Klick auf der Seite auf "Musical Instrument Samples/Post 2012/Woodwinds"
 
 ### Inspiration for future research
 [Junyoung Chung, Kyle Kastner, A Recurrent Latent Variable Model for Sequential Data](http://arxiv.org/pdf/1506.02216v6.pdf)
+
 [Justin Bayer & Christian Osendorfer, EARNING STOCHASTIC RECURRENT NETWORKS](http://arxiv.org/pdf/1411.7610v3.pdf)
 
 
