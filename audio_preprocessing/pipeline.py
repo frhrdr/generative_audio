@@ -302,7 +302,9 @@ class AudioSignal(object):
         self._spectra = None
 
     def make_matrix(self):
-        return self.nd_signal.reshape((self.duration, self.sample_rate))
+        n_duration = self.duration * self.sample_rate
+        t = self.nd_signal[:n_duration]
+        return t.reshape((-1, self.sample_rate))
 
     def normalize(self):
         # normalize amplitude values to a range between -1 and 1
@@ -311,8 +313,6 @@ class AudioSignal(object):
 
     @property
     def normalized_signal_matrix(self):
-        if not self.is_normalized:
-            self.normalize()
         return self.make_matrix()
 
     def divisible_matrix(self, divisor):
