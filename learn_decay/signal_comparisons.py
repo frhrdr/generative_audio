@@ -7,7 +7,7 @@ from scipy.signal import savgol_filter
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 from audio_preprocessing.pipeline import AudioPipeline
-# note: add diff to plots
+
 
 def rms_error(signal, reconstruction, verbose=False):
     n = len(reconstruction)
@@ -28,12 +28,10 @@ def plot_signals(signal, reconstruction, separate=False, display=True):
         subplot(3, 1, 1)
         title('signal')
         plot(t, signal)
-        # xlabel('Time')
         ylabel('Amplitude')
         subplot(3, 1, 2)
         title('reconstruction')
         plot(t, reconstruction)
-        # xlabel('Time')
         ylabel('Amplitude')
         subplot(3, 1, 3)
         title('difference')
@@ -45,7 +43,6 @@ def plot_signals(signal, reconstruction, separate=False, display=True):
         title('signal: g, reconstruction: b')
         plot(t, signal, "g")
         plot(t, reconstruction, "b")
-        # xlabel('Time')
         ylabel('Amplitude')
         subplot(2, 1, 2)
         title('difference')
@@ -74,12 +71,10 @@ def plot_spectra(signal, reconstruction, sampling_freq, separate=False, display=
         subplot(3, 1, 1)
         title('signal')
         plot(frq, sig_spec)
-        # xlabel('Freq (Hz)')
         ylabel('|Y(freq)|')
         subplot(3, 1, 2)
         title('reconstruction')
         plot(frq, rec_spec)
-        # xlabel('Freq (Hz)')
         ylabel('|Y(freq)|')
         subplot(3, 1, 3)
         title('difference')
@@ -91,7 +86,6 @@ def plot_spectra(signal, reconstruction, sampling_freq, separate=False, display=
         title('signal: g, reconstruction: b')
         plot(frq, sig_spec, "g")
         plot(frq, rec_spec, "b")
-        # xlabel('Freq (Hz)')
         ylabel('|Y(freq)|')
         subplot(2, 1, 2)
         title('reconstruction')
@@ -153,7 +147,8 @@ def plot_decays(signal, reconstruction, coeff_signal, coeff_recon, separate=Fals
         show()
 
 
-def spectrogram_from_signal(signal, window_size=1024, stride=512, highest_freq=4000, display=True, root_signal=False):
+def spectrogram_from_signal(signal, window_size=1024, stride=512, highest_freq=4000,
+                            fname='', display=True, root_signal=False):
 
     num_specs = (len(signal) - window_size) / stride
     spec = np.zeros((num_specs, window_size/2))
@@ -181,6 +176,10 @@ def spectrogram_from_signal(signal, window_size=1024, stride=512, highest_freq=4
     ax.set_yticklabels(col_labels, minor=False)
     plt.xlabel('Frequency (in Hz)')
     plt.ylabel('Time (in Frames)')
+    if root_signal:
+        plt.title(fname + ' (sqrt)')
+    else:
+        plt.title(fname)
 
     if display:
         plt.show()
@@ -189,9 +188,10 @@ def spectrogram_from_signal(signal, window_size=1024, stride=512, highest_freq=4
 def spectrogram_from_file(directory, file_idx=0, highest_freq=4000, down_sampling=True, display=True, root_signal=False):
 
     audios = AudioPipeline(directory, n_to_load=file_idx+1, highest_freq=highest_freq, down_sampling=down_sampling)
-    print('plotting spectrum for ', audios.files_to_load[file_idx])
+    fname = audios.files_to_load[file_idx]
     signal = None
     a = audios.train_batches()
     for idx in range(file_idx+1):
         signal = next(a).nd_signal
-    spectrogram_from_signal(signal, highest_freq=audios.new_sample_rate/2, display=display, root_signal=root_signal)
+    spectrogram_from_signal(signal, highest_freq=audios.new_sample_rate/2, display=display,
+                            fname=fname, root_signal=root_signal)
