@@ -58,3 +58,13 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 Klick auf der Seite auf "Musical Instrument Samples/Post 2012/Woodwinds"
 
 [List of frequency ranges of many classical instruments](http://www.zytrax.com/tech/audio/audio.html#frequencies)
+
+### Divers & interesting
+[Stephan Mallat - Understanding Deep Convolutional Networks](https://arxiv.org/pdf/1601.04920v1.pdf)
+[JOINT TIME-FREQUENCY SCATTERING FOR AUDIO CLASSIFICATION](https://web.math.princeton.edu/~janden/papers/final97.pdf)
+
+### Inspiration for future research
+[Junyoung Chung, Kyle Kastner, A Recurrent Latent Variable Model for Sequential Data](http://arxiv.org/pdf/1506.02216v6.pdf)
+[Justin Bayer & Christian Osendorfer, EARNING STOCHASTIC RECURRENT NETWORKS](http://arxiv.org/pdf/1411.7610v3.pdf)
+
+
