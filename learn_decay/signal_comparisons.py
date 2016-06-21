@@ -5,6 +5,8 @@ from scipy import fft, arange
 import scipy.signal.signaltools as sigtool
 from scipy.signal import savgol_filter
 from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
+from audio_preprocessing.pipeline import AudioPipeline
 # note: add diff to plots
 
 def rms_error(signal, reconstruction, verbose=False):
@@ -150,3 +152,46 @@ def plot_decays(signal, reconstruction, coeff_signal, coeff_recon, separate=Fals
     if display:
         show()
 
+
+def spectrogram_from_signal(signal, window_size=1024, stride=512, highest_freq=4000, display=True, root_signal=False):
+
+    num_specs = (len(signal) - window_size) / stride
+    spec = np.zeros((num_specs, window_size/2))
+    for idx in range(num_specs):
+        # print(idx*stride)
+        s = np.abs(np.fft.fft(signal[idx*stride:idx*stride + window_size])[:window_size/2])
+        if root_signal:
+            s = np.sqrt(s)
+        spec[idx, :] = s
+
+    fig, ax = plt.subplots()
+    ax.pcolor(spec, cmap=plt.cm.plasma)
+
+    row_tick_stride = spec.shape[1]/10
+    col_tick_stride = spec.shape[0]/10
+
+    row_labels = [highest_freq * k / spec.shape[1] for k in range(0, spec.shape[1], row_tick_stride)]
+    col_labels = [stride*k for k in range(1, spec.shape[0] + 1, col_tick_stride)]
+
+    ax.set_xticks(np.arange(0, spec.shape[1], row_tick_stride)+0.5, minor=False)
+    ax.set_yticks(np.arange(0, spec.shape[0], col_tick_stride)+0.5, minor=False)
+    plt.axis('tight')
+
+    ax.set_xticklabels(row_labels, minor=False)
+    ax.set_yticklabels(col_labels, minor=False)
+    plt.xlabel('Frequency (in Hz)')
+    plt.ylabel('Time (in Frames)')
+
+    if display:
+        plt.show()
+
+
+def spectrogram_from_file(directory, file_idx=0, highest_freq=4000, down_sampling=True, display=True, root_signal=False):
+
+    audios = AudioPipeline(directory, n_to_load=file_idx+1, highest_freq=highest_freq, down_sampling=down_sampling)
+    print('plotting spectrum for ', audios.files_to_load[file_idx])
+    signal = None
+    a = audios.train_batches()
+    for idx in range(file_idx+1):
+        signal = next(a).nd_signal
+    spectrogram_from_signal(signal, highest_freq=audios.new_sample_rate/2, display=display, root_signal=root_signal)
