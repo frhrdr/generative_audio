@@ -13,7 +13,7 @@ def train_func(train_dir, matrix_file='', n_hid_neurons=1024, n_rec_layers=1, ep
                activation='linear', architecture=1, mean_std_per_file=False):
 
     if matrix_file is '':
-        matrix_file = train_dir
+        matrix_file = train_dir.replace('/', '_')  # just in case it happens to be a path
     dpath = config.datapath + root_to_folder + train_dir
     fpath = dpath + '/' + matrix_file + '.npy'
 
