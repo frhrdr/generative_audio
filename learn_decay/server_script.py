@@ -19,7 +19,7 @@ if train:
                                            mean_std_per_file=True,
                                            activation='linear')
 
-    folder_spec = '/instrument_samples/guitar_train/'
+    folder_spec = '/instrument_samples/guitar_train/tmp/'
     data = d_mat_name
     model_name = w_mat_name
 else:
