@@ -183,10 +183,12 @@ def spectrogram_from_signal(signal, window_size=1024, stride=512, root_signal=Fa
     plt.show()
 
 
-def spectrogram_from_file(dir, file_idx=1, highest_freq=4000, down_sampling=True):
+def spectrogram_from_file(directory, file_idx=0, highest_freq=4000, down_sampling=True):
 
-    audios = AudioPipeline(dir, n_to_load=file_idx, highest_freq=highest_freq, down_sampling=down_sampling)
+    audios = AudioPipeline(directory, n_to_load=file_idx+1, highest_freq=highest_freq, down_sampling=down_sampling)
+    print('plotting spectrum for ', audios.files_to_load[file_idx])
     signal = None
-    for idx in range(file_idx):
-        signal = next(audios.train_batches()).nd_signal
+    a = audios.train_batches()
+    for idx in range(file_idx+1):
+        signal = next(a).nd_signal
     spectrogram_from_signal(signal, root_signal=True)
