@@ -4,6 +4,7 @@ from keras.layers.core import Dense, Flatten, Reshape
 from keras.layers.recurrent import LSTM
 from keras.layers.convolutional import Convolution1D
 from keras.layers import BatchNormalization, MaxPooling1D, UpSampling1D
+import keras.backend as K
 
 
 # taken from MattVitelli's GRUV project
@@ -30,16 +31,16 @@ def create_conv_lstm_network(num_frequency_dimensions, num_hidden_dimensions,
                                             num_recurrent_units=1, stateful=False):
 
     model = Sequential()
-    model.add(TimeDistributed(Convolution1D(32, 41, border_mode='same', name="1_conv1d", activation='relu'),
+    model.add(TimeDistributed(Convolution1D(32, 41, border_mode='same', name="1_conv1d", activation='tanh'),
                               input_shape=(None, num_frequency_dimensions, 1), name="1_timedist"))
-    model.add(TimeDistributed(BatchNormalization()))
-    model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
-    model.add(TimeDistributed(Convolution1D(16, 17, activation='relu', border_mode='same')))
-    model.add(TimeDistributed(BatchNormalization()))
-    model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
-    model.add(TimeDistributed(Convolution1D(8, 3, activation='relu', border_mode='same')))
-    model.add(TimeDistributed(BatchNormalization()))
-    model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
+    # model.add(TimeDistributed(BatchNormalization()))
+    # model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
+    # model.add(TimeDistributed(Convolution1D(16, 17, activation='tanh', border_mode='same')))
+    # model.add(TimeDistributed(BatchNormalization()))
+    # model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
+    # model.add(TimeDistributed(Convolution1D(8, 3, activation='tanh', border_mode='same')))
+    # model.add(TimeDistributed(BatchNormalization()))
+    # model.add(TimeDistributed(MaxPooling1D(2, border_mode='valid')))
     model.add(TimeDistributed(Flatten()))
     for cur_unit in xrange(num_recurrent_units):
         model.add(LSTM(output_dim=num_hidden_dimensions, return_sequences=True, stateful=stateful))
