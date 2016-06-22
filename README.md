@@ -64,6 +64,7 @@ Klick auf der Seite auf "Musical Instrument Samples/Post 2012/Woodwinds"
 
 ### Divers & interesting
 [Stephan Mallat - Understanding Deep Convolutional Networks](https://arxiv.org/pdf/1601.04920v1.pdf)
+
 [JOINT TIME-FREQUENCY SCATTERING FOR AUDIO CLASSIFICATION](https://web.math.princeton.edu/~janden/papers/final97.pdf)
 
 ### Inspiration for future research
