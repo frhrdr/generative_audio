@@ -12,7 +12,7 @@ if train:
                                            n_to_load=45,
                                            down_sampling=True,
                                            save_weights=True,
-                                           chunks_per_sec=60,
+                                           chunks_per_sec=120,
                                            clip_len=5,
                                            add_spectra=False,
                                            architecture='1',
@@ -28,7 +28,7 @@ else:
 
     folder_spec = '/instrument_samples/guitar_train/tmp'
 
-prime_length = 20
+prime_length = 40
 num_of_tests = 4
 gen_seq_full(folder_spec=folder_spec, data=data, model_name=model_name,
              prime_length=prime_length, num_of_tests=num_of_tests, add_spectra=False, mean_std_per_file=True)
