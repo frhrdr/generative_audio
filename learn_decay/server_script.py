@@ -34,7 +34,8 @@ from generate_seq import gen_seq_full
                            spec = raw + DFT values of signal, concatenated in one matrix with "additional" columns
                                   real + complex values of DFT
                            
-        (3) data:       specifies the name of the file that contains the training data (see above for more explanation)                   
+        (3) data:       specifies the name of the file that contains the training or test data
+                        (see above for more explanation)                   
                        
         (4) model_name: when "train" is set to "True this variable will be automatically set.
                         when "train" is set to "False" it is important that the variable specifies the "root" name
