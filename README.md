@@ -1,15 +1,6 @@
 # generative_audio
 MSc AI Project on generative deep networks and neural style transfer for audio
 
-
-### Links
-
-[Markup cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#links)
-
-[Python & audio](http://eprints.maynoothuniversity.ie/4115/1/40.pdf)
-
-[Digital Signal Processing](http://www.dspguide.com/)
-
 #### About RNN/LSTMs
 
 [Introduction to RNN/LSTM](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/)
@@ -75,4 +66,11 @@ Klick auf der Seite auf "Musical Instrument Samples/Post 2012/Woodwinds"
 
 [Justin Bayer & Christian Osendorfer, EARNING STOCHASTIC RECURRENT NETWORKS](http://arxiv.org/pdf/1411.7610v3.pdf)
 
+### Just some other practical stuff
+
+[Markup cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#links)
+
+[Python & audio](http://eprints.maynoothuniversity.ie/4115/1/40.pdf)
+
+[Digital Signal Processing](http://www.dspguide.com/)
 
