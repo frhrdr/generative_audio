@@ -3,7 +3,7 @@ MSc AI Project on generative deep networks and neural style transfer for audio
 
 #### Running the code
 
-We prepared the script server_script.py in the [learn_decay folder](https://github.com/Fr-d-rik/generative_audio/tree/master/learn_decay) which hopefully contains a detailed enough
+We prepared a short program **server_script.py in the [learn_decay folder](https://github.com/Fr-d-rik/generative_audio/tree/master/learn_decay) which hopefully contains a detailed enough
 description of how to train a model and generate a test sequence.
 
 [Our results are here](https://github.com/Fr-d-rik/generative_audio/tree/master/results)
