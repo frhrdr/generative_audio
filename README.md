@@ -8,6 +8,14 @@ description on how to train a model and generate a test sequence.
 
 [Our results are here](https://github.com/Fr-d-rik/generative_audio/tree/master/results)
 
+
+### Presentations
+[Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
+
+[Week 2 - 10/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/Presentation 10-6-2016.pdf)
+
+[Final presentation](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/generative_audio.pdf)
+
 #### About RNN/LSTMs
 
 [Introduction to RNN/LSTM](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/)
@@ -46,14 +54,6 @@ description on how to train a model and generate a test sequence.
 [Paper comparing different decay measures](http://www.genelec.com/documents/publications/aes110th.pdf)
 
 [Yaafe - package for audio feature extraction](http://yaafe.sourceforge.net/)
-
-
-### Presentations
-[Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
-
-[Week 2 - 10/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/Presentation 10-6-2016.pdf)
-
-[Final presentation](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/generative_audio.pdf)
 
 
 ### Data
