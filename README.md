@@ -1,6 +1,8 @@
 # generative_audio
 MSc AI Project on generative deep networks and neural style transfer for audio
 
+[Our results are here](https://github.com/Fr-d-rik/generative_audio/tree/master/results)
+
 #### About RNN/LSTMs
 
 [Introduction to RNN/LSTM](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/)
