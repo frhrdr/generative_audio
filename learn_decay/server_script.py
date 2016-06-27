@@ -27,8 +27,13 @@ from generate_seq import gen_seq_full
                        (b) if set to "True" the model will be first trained in addition to what is described under (a)
                            The program will search for compressed numpy files in the "train_dir" which contains
                            the necessary training data (matrices). Otherwise the wav files in the directory will be
-                           loaded, preprocessed and saved. The naming convention is:
+                           loaded, preprocessed and saved. Below an example of a matrix filename
                            e.g.: guitar_train_45files_5sec_60res_1400maxf_spec.npy
+                           <instrument><num of files trained><clip length><max freq of instrument><raw or spec>.npy
+                           raw = scaled and normalized amplitude values of signal
+                           spec = raw + DFT values of signal, concatenated in one matrix with "additional" columns
+                                  real + complex values of DFT
+                           
         (3) data:       specifies the name of the file that contains the training data (see above for more explanation)                   
                        
         (4) model_name: when "train" is set to "True this variable will be automatically set.
