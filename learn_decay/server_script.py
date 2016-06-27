@@ -14,9 +14,10 @@ from generate_seq import gen_seq_full
     this script can be used to train and generate one of the following RNN models
     (1) architecture='1': simple LSTM model
         
-    (2) architecture='2': CNN combined with an LSTM model
+    (2) architecture='2': CNN combined with LSTM model
     
     Some explanations in regards to the parameters/variables:
+    
         (1) train_dir: points to a directory that contains the wav sound files the model is being trained on.
                        The directory must exist under the root of the repository in the "data/instrument_samples/" 
                        directory
@@ -24,7 +25,13 @@ from generate_seq import gen_seq_full
                        (default) two sound signals based on prime signals that reside in the directory specified 
                        by the "folder_spec" variable.
                        (b) if set to "True" the model will be first trained in addition to what is described under (a)
-        (3) model_name: when "train" is set to "True this variable will be automatically set.
+                           The program will search for compressed numpy files in the "train_dir" which contains
+                           the necessary training data (matrices). Otherwise the wav files in the directory will be
+                           loaded, preprocessed and saved. The naming convention is:
+                           e.g.: guitar_train_45files_5sec_60res_1400maxf_spec.npy
+        (3) data:       specifies the name of the file that contains the training data (see above for more explanation)                   
+                       
+        (4) model_name: when "train" is set to "True this variable will be automatically set.
                         when "train" is set to "False" it is important that the variable specifies the "root" name
                         of the model and weight matrix file.
                         E.g. if model_name =  'guitar_train_45files_5sec_60res_1400maxf_spec_m1_512hid_1lyrs_180ep_linearact'
@@ -32,11 +39,11 @@ from generate_seq import gen_seq_full
                              directory:
                              guitar_train_45files_5sec_60res_1400maxf_spec_m1_512hid_1lyrs_180ep_linearact_model.json
                              guitar_train_45files_5sec_60res_1400maxf_spec_m1_512hid_1lyrs_180ep_linearact_weights.h5
-        (4) prime_length: number of time slices used for the prime signal. E.g. the above mentioned model expects
+        (5) prime_length: number of time slices used for the prime signal. E.g. the above mentioned model expects
                           sound signals that are separated into 60 time slices/second. 
                           We found that if we use 1/3 of a second (in this case prime_length=20) as prime this results 
                           most oftnen in reasonable results while generating new sequences.
-        (5) num_of_tests: the number of test
+        (6) num_of_tests: the number of times the program will generate a test sequence
 """
 
 train = True
@@ -57,7 +64,7 @@ if train:
                                            mean_std_per_file=True,  # True=calc global mean/stddev; False=calc mean/stddev for each file
                                            activation='linear')     # activation function used in dense layers
 
-    folder_spec = '/instrument_samples/guitar_train/'
+    folder_spec = '/instrument_samples/guitar_train/'   # used for the generation process, can point to directory of test files
     data = d_mat_name
     model_name = w_mat_name
 else:
@@ -66,7 +73,7 @@ else:
 
     folder_spec = '/instrument_samples/guitar_train/'
 
-prime_length = 40
+prime_length = 20
 num_of_tests = 2
 gen_seq_full(folder_spec=folder_spec, data=data, model_name=model_name,
              prime_length=prime_length, num_of_tests=num_of_tests, add_spectra=False, mean_std_per_file=True)
