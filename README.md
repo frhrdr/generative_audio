@@ -12,7 +12,7 @@ Here you can [_listen_](https://github.com/Fr-d-rik/generative_audio/tree/master
 ### Presentations
 [Week 2 - 7/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/presi_june7.pdf)
 
-[Week 2 - 10/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/Presentation 10-6-2016.pdf)
+[Week 2 - 10/6/2016](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/Presentation_10-6-2016.pdf)
 
 [Final presentation](https://github.com/Fr-d-rik/generative_audio/blob/master/docs/generative_audio.pdf)
 
